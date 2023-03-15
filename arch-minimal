@@ -180,8 +180,8 @@ do
         mount /dev/$boot /mnt/boot/efi
         break;;
         2) echo "Bootloader selected - SYSTEMD-BOOT"
-        mkdir -p /mnt/boot
-        mount /dev/$boot /mnt/boot
+        mkdir -p /mnt/efi
+        mount /dev/$boot /mnt/efi
         break;;
         *) echo "Incorrect input. Try again ..."
         continue;;
@@ -540,39 +540,39 @@ Please << umount -a >> all devices and << reboot >> in to the new system!!!
 "; echo
 else
     ${bootctl_install}
-    arch-chroot /mnt /bin/bash -c "bootctl --path=/boot install"
-    arch-chroot /mnt /bin/bash -c "echo 'timeout 10' > /boot/loader/loader.conf"
-    arch-chroot /mnt /bin/bash -c "echo 'console-mode auto' >> /boot/loader/loader.conf"
-    arch-chroot /mnt /bin/bash -c "echo 'editor no' >> /boot/loader/loader.conf"
-    arch-chroot /mnt /bin/bash -c "echo 'default arch.conf' >> /boot/loader/loader.conf"
-    arch-chroot /mnt /bin/bash -c "echo 'title    Arch Linux' > /boot/loader/entries/arch.conf"
-    arch-chroot /mnt /bin/bash -c "echo 'linux    /vmlinuz-linux' >> /boot/loader/entries/arch.conf"
-    arch-chroot /mnt /bin/bash -c "echo 'initrd    /$cpu-ucode.img' >> /boot/loader/entries/arch.conf"
-    arch-chroot /mnt /bin/bash -c "echo 'initrd    /initramfs-linux.img' >> /boot/loader/entries/arch.conf"
-    arch-chroot /mnt /bin/bash -c "echo 'title    Arch Linux fallback' > /boot/loader/entries/arch-fb.conf"
-    arch-chroot /mnt /bin/bash -c "echo 'linux    /vmlinuz-linux' >> /boot/loader/entries/arch-fb.conf"
-    arch-chroot /mnt /bin/bash -c "echo 'initrd    /$cpu-ucode.img' >> /boot/loader/entries/arch-fb.conf"
-    arch-chroot /mnt /bin/bash -c "echo 'initrd    /initramfs-linux-fallback.img' >> /boot/loader/entries/arch-fb.conf"
+    arch-chroot /mnt /bin/bash -c "bootctl --path=/efi install"
+    arch-chroot /mnt /bin/bash -c "echo 'timeout menu-force' > /efi/loader/loader.conf"
+    arch-chroot /mnt /bin/bash -c "echo 'console-mode auto' >> /efi/loader/loader.conf"
+    arch-chroot /mnt /bin/bash -c "echo 'editor no' >> /efi/loader/loader.conf"
+    arch-chroot /mnt /bin/bash -c "echo 'default arch.conf' >> /efi/loader/loader.conf"
+    arch-chroot /mnt /bin/bash -c "echo 'title    Arch Linux' > /efi/loader/entries/arch.conf"
+    arch-chroot /mnt /bin/bash -c "echo 'linux    /vmlinuz-linux' >> /efi/loader/entries/arch.conf"
+    arch-chroot /mnt /bin/bash -c "echo 'initrd    /$cpu-ucode.img' >> /efi/loader/entries/arch.conf"
+    arch-chroot /mnt /bin/bash -c "echo 'initrd    /initramfs-linux.img' >> /efi/loader/entries/arch.conf"
+    arch-chroot /mnt /bin/bash -c "echo 'title    Arch Linux fallback' > /efi/loader/entries/arch-fb.conf"
+    arch-chroot /mnt /bin/bash -c "echo 'linux    /vmlinuz-linux' >> /efi/loader/entries/arch-fb.conf"
+    arch-chroot /mnt /bin/bash -c "echo 'initrd    /$cpu-ucode.img' >> /efi/loader/entries/arch-fb.conf"
+    arch-chroot /mnt /bin/bash -c "echo 'initrd    /initramfs-linux-fallback.img' >> /efi/loader/entries/arch-fb.conf"
     if [[ "$fs_type" = "1" ]]; then
-        arch-chroot /mnt /bin/bash -c "echo 'options    rw root=\"LABEL=ROOT\" quiet splash loglevel=3 nowatchdog rootfstype=btrfs rootflags=subvol=@' >> /boot/loader/entries/arch.conf"
-        arch-chroot /mnt /bin/bash -c "echo 'options    rw root=\"LABEL=ROOT\" quiet splash loglevel=3 nowatchdog rootfstype=btrfs rootflags=subvol=@' >> /boot/loader/entries/arch-fb.conf"
+        arch-chroot /mnt /bin/bash -c "echo 'options    rw root=\"LABEL=ROOT\" quiet splash loglevel=3 nowatchdog rootfstype=btrfs rootflags=subvol=@' >> /efi/loader/entries/arch.conf"
+        arch-chroot /mnt /bin/bash -c "echo 'options    rw root=\"LABEL=ROOT\" quiet splash loglevel=3 nowatchdog rootfstype=btrfs rootflags=subvol=@' >> /efi/loader/entries/arch-fb.conf"
     else
-        arch-chroot /mnt /bin/bash -c "echo 'options    rw root=\"LABEL=ROOT\" quiet splash loglevel=3 nowatchdog' >> /boot/loader/entries/arch.conf"
-        arch-chroot /mnt /bin/bash -c "echo 'options    rw root=\"LABEL=ROOT\" quiet splash loglevel=3 nowatchdog' >> /boot/loader/entries/arch-fb.conf"
+        arch-chroot /mnt /bin/bash -c "echo 'options    rw root=\"LABEL=ROOT\" quiet splash loglevel=3 nowatchdog' >> /efi/loader/entries/arch.conf"
+        arch-chroot /mnt /bin/bash -c "echo 'options    rw root=\"LABEL=ROOT\" quiet splash loglevel=3 nowatchdog' >> /efi/loader/entries/arch-fb.conf"
     fi
     echo -en "Check your bootloader ...\n"
     echo -en "--------------------------------------------------\n"
-    arch-chroot /mnt /bin/bash -c "cat /boot/loader/loader.conf"
+    arch-chroot /mnt /bin/bash -c "cat /efi/loader/loader.conf"
     echo -en "--------------------------------------------------\n"
     read -r -sn1 -p "to next, press any key ...
 "; echo
     echo -en "--------------------------------------------------\n"
-    arch-chroot /mnt /bin/bash -c "cat /boot/loader/entries/arch.conf"
+    arch-chroot /mnt /bin/bash -c "cat /efi/loader/entries/arch.conf"
     echo -en "--------------------------------------------------\n"
     read -r -sn1 -p "to next, press any key ...
 "; echo
     echo -en "--------------------------------------------------\n"
-    arch-chroot /mnt /bin/bash -c "cat /boot/loader/entries/arch-fb.conf"
+    arch-chroot /mnt /bin/bash -c "cat /efi/loader/entries/arch-fb.conf"
     echo -en "--------------------------------------------------\n"
     read -r -sn1 -p "to next, press any key ...
 "; echo
