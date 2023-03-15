@@ -6,7 +6,7 @@
 # License   : The MIT License (https://opensource.org/license/mit/)
 # Version   : v 2.0
 # --------------------------------------------------
-# 08.03.2023
+# 15.03.2023
 
 clear
 
@@ -361,7 +361,7 @@ clear
 #-------------------------------------------------------------------------------
 pacman -Sy --noconfirm archlinux-keyring
 pacman -S reflector --noconfirm
-reflector --verbose --latest 5 --sort rate --save /etc/pacman.d/mirrorlist
+reflector --verbose --country 'Russia,Germany,' --latest 5 --sort rate --save /etc/pacman.d/mirrorlist
 pacman -Syy
 #-------------------------------------------------------------------------------
 echo -en "--------------------------------------------------\n"
