@@ -518,7 +518,7 @@ sed -i s/'#VerbosePkgLists'/'VerbosePkgLists'/g /mnt/etc/pacman.conf
 sed -i s/'#ParallelDownloads = 5'/'ParallelDownloads = 5'/g /mnt/etc/pacman.conf
 sed -i "/\[multilib\]/,/Include/"'s/^#//' /mnt/etc/pacman.conf
 arch-chroot /mnt /bin/bash -c "pacman -Syy"
-arch-chroot /mnt /bin/bash -c "reflector --verbose --latest 5 --sort rate --save /etc/pacman.d/mirrorlist"
+arch-chroot /mnt /bin/bash -c "reflector --verbose --country 'Russia,Germany,' --latest 5 --sort rate --save /etc/pacman.d/mirrorlist"
 echo -en "--------------------------------------------------\n"
 read -r -sn1 -p "Pacman configured, press any key ..."; echo
 #-------------------------------------------------------------------------------
