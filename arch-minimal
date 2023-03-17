@@ -540,7 +540,7 @@ Please << umount -a >> all devices and << reboot >> in to the new system!!!
 "; echo
 else
     ${bootctl_install}
-    arch-chroot /mnt /bin/bash -c "bootctl --path=/boot install"
+    arch-chroot /mnt /bin/bash -c "bootctl install"
     arch-chroot /mnt /bin/bash -c "echo 'timeout menu-force' > /boot/loader/loader.conf"
     arch-chroot /mnt /bin/bash -c "echo 'console-mode auto' >> /boot/loader/loader.conf"
     arch-chroot /mnt /bin/bash -c "echo 'editor no' >> /boot/loader/loader.conf"
