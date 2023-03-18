@@ -191,8 +191,9 @@ do
     read -r -p "| Your choise (1/2): >>> " boot_type
     case $boot_type in
         1) echo "Bootloader selected - GRUB"
-        mkdir -p /mnt/boot/efi
-        mount /dev/$boot /mnt/boot/efi
+        mkdir -p /mnt/{boot,efi}
+        mount /dev/$esp /mnt/efi
+        mount /dev/$boot /mnt/boot
         break;;
         2) echo "Bootloader selected - SYSTEMD-BOOT"
         mkdir -p /mnt/{boot,efi}
