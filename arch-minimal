@@ -59,6 +59,19 @@ user_answer=""
 while true
 do
 	echo -en "--------------------------------------------------\n"
+    echo -en "Create the partitions:\n"
+    echo -en "ESP (EFI system partition)\n"
+    echo -en "Type: EFI System\n"
+    echo -en "Size: ~100M\n"
+    echo -en "--------------------------------------------------\n"
+    echo -en "BOOT\n"
+    echo -en "Type: Linux extended boot\n"
+    echo -en "Size: At your discretion ~300M\n"
+    echo -en "--------------------------------------------------\n"
+    echo -en "ROOT\n"
+    echo -en "Type: Linux filesystem\n"
+    echo -en "Size: All other space\n"
+    echo -en "--------------------------------------------------\n"
     echo -en "WARNING!!! all data on /dev/$archdisk will be REMOVED\n"
     echo -en "The answer \"No\" will terminate the script execution\n"
     echo -en "Continue?\n"
@@ -68,14 +81,13 @@ do
 	    Yes | yes | Yep | yep | Y | y) echo "Preparing the disk ..."
 	    sleep 2
 	    wipefs -af /dev/$archdisk
-		cfdisk /dev/$archdisk
+		gdisk /dev/$archdisk
 	    break;;
 	    No | no | Nope | nope | N | n) echo "The script is closed ..."
 	    sleep 2
 	    clear
 	    exit;;
-	    *) echo "Incorrect input. Try again ..."
-	    continue;;
+	    *) echo "Incorrect input. Try again ..." continue;;
     esac
 done
 clear
@@ -103,13 +115,13 @@ echo -en "--------------------------------------------------\n"
 echo -en "Your choise:\n"
 echo -en "--------------------------------------------------\n"
 echo -en "/dev/$esp ->  EFI system partition\n"
-echo -en "/dev/$boot -> boot partition\n"
+echo -en "/dev/$boot -> BOOT partition\n"
 if [ -z "$swap" ]; then
-    echo -en "/without a swap partition\n"
+    echo -en "/without a SWAP partition\n"
 else
-    echo -en "/dev/$swap -> swap partition\n"
+    echo -en "/dev/$swap -> SWAP partition\n"
 fi
-echo -en "/dev/$root -> root partition\n"
+echo -en "/dev/$root -> ROOT partition\n"
 echo -en "--------------------------------------------------\n"
 echo -en "\n"
 echo -en "--------------------------------------------------\n"
@@ -165,8 +177,7 @@ do
         mount  /dev/$root /mnt
         mkdir -p /mnt/{home,$adddir}
         break;;
-        *) echo "Incorrect input. Try again ..."
-        continue;;
+        *) echo "Incorrect input. Try again ..." continue;;
     esac
 done
 #
@@ -188,8 +199,7 @@ do
         mount /dev/$esp /mnt/efi
         mount /dev/$boot /mnt/boot
         break;;
-        *) echo "Incorrect input. Try again ..."
-        continue;;
+        *) echo "Incorrect input. Try again ..." continue;;
     esac
 done
 #-------------------------------------------------------------------------------
@@ -244,8 +254,7 @@ do
         case $again_choise in
             Yes | yes | Yep | yep | Y | y) continue;;
             No | no | Nope | nope | N | n) break;;
-            *) echo -en "| Incorrect input, try again ...\n"
-            continue;;
+            *) echo -en "| Incorrect input, try again ...\n" continue;;
         esac;;
 	    2) echo -en "\n"; read -r -p "| Enter your password here >>> " password
 	    echo -en "\n"
@@ -292,8 +301,7 @@ do
         case $again_choise in
             Yes | yes | Yep | yep | Y | y) continue;;
             No | no | Nope | nope | N | n) break;;
-            *) echo -en "| Incorrect input, try again ...\n"
-            continue;;
+            *) echo -en "| Incorrect input, try again ...\n" continue;;
         esac;;
 	    2) echo -en "\n"; read -r -p "| Enter your password here >>> " password
 	    echo -en "\n"
@@ -339,7 +347,7 @@ vendors=("amd" "intel")
 		break
 	else
 		echo "$cpu !!! incorrect input, try again ..."
-		continue
+        continue
 	fi
 done
 clear
@@ -394,8 +402,7 @@ do
 	    break;;
 	    No | no | Nope | nope | N | n) echo "Continue without copying ..."
 	    break;;
-	    *) echo "Incorrect input. Try again ..."
-	    continue;;
+	    *) echo "Incorrect input. Try again ..." continue;;
     esac
 done
 #-------------------------------------------------------------------------------
@@ -491,7 +498,7 @@ read -r -sn1 -p "$usernm created and configured, press any key to enabling and s
 "; echo
 #-------------------------------------------------------------------------------
 success=("Yes" "yes" "Yep" "yep" "Y" "y")
-if [[ " ${success[*]} " =~ " ${cp_net_settings} " ]]; then
+if [[ "${success[*]}" =~ "${cp_net_settings}" ]]; then
     pacstrap -K /mnt iwd --noconfirm
     arch-chroot /mnt /bin/bash -c "echo '[General]' > /etc/iwd/main.conf"
     arch-chroot /mnt /bin/bash -c "echo 'EnableNetworkConfiguration=true' >> /etc/iwd/main.conf"
@@ -535,7 +542,7 @@ read -r -sn1 -p "Initial ramdisk environment created, press any key to install b
 #-------------------------------------------------------------------------------
 if [[ "$boot_type" = "1" ]]; then
     ${grub_install}
-    arch-chroot /mnt /bin/bash -c "grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=ArchLinux"
+    arch-chroot /mnt /bin/bash -c "grub-install --target=x86_64-efi --efi-directory=/efi --boot-directory=/boot --bootloader-id=Linux Boot Manager"
     arch-chroot /mnt /bin/bash -c "grub-mkconfig -o /boot/grub/grub.cfg"
     read -r -sn1 -p "GRUB installed and configured
 -------------------------------------------------------------------------------
@@ -544,7 +551,7 @@ Please << umount -a >> all devices and << reboot >> in to the new system!!!
 -------------------------------------------------------------------------------
 "; echo
 else
-#    ${bootctl_install}
+    ${bootctl_install}
     arch-chroot /mnt /bin/bash -c "bootctl --esp-path=/efi --boot-path=/boot install"
     arch-chroot /mnt /bin/bash -c "echo 'timeout menu-force' > /efi/loader/loader.conf"
     arch-chroot /mnt /bin/bash -c "echo 'console-mode auto' >> /efi/loader/loader.conf"
@@ -569,18 +576,15 @@ else
     echo -en "--------------------------------------------------\n"
     arch-chroot /mnt /bin/bash -c "cat /efi/loader/loader.conf"
     echo -en "--------------------------------------------------\n"
-    read -r -sn1 -p "to next, press any key ...
-"; echo
+    read -r -sn1 -p "to next, press any key ..."; echo
     echo -en "--------------------------------------------------\n"
     arch-chroot /mnt /bin/bash -c "cat /boot/loader/entries/arch.conf"
     echo -en "--------------------------------------------------\n"
-    read -r -sn1 -p "to next, press any key ...
-"; echo
+    read -r -sn1 -p "to next, press any key ..."; echo
     echo -en "--------------------------------------------------\n"
     arch-chroot /mnt /bin/bash -c "cat /boot/loader/entries/arch-fb.conf"
     echo -en "--------------------------------------------------\n"
-    read -r -sn1 -p "to next, press any key ...
-"; echo
+    read -r -sn1 -p "to next, press any key ..."; echo
     echo -en "--------------------------------------------------\n"
     read -r -sn1 -p "SYSTEMD-BOOT installed and configured
 -------------------------------------------------------------------------------
