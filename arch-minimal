@@ -60,17 +60,18 @@ while true
 do
 	echo -en "--------------------------------------------------\n"
     echo -en "Create the partitions:\n"
+    echo -en "**********************\n"
     echo -en "ESP (EFI system partition)\n"
-    echo -en "Type: EFI System\n"
-    echo -en "Size: ~100M\n"
+    echo -en "| Type: EFI System\n"
+    echo -en "| Size: ~100M\n"
     echo -en "--------------------------------------------------\n"
     echo -en "BOOT\n"
-    echo -en "Type: Linux extended boot\n"
-    echo -en "Size: At your discretion ~300M\n"
+    echo -en "| Type: Linux extended boot\n"
+    echo -en "| Size: At your discretion ~300M\n"
     echo -en "--------------------------------------------------\n"
     echo -en "ROOT\n"
-    echo -en "Type: Linux filesystem\n"
-    echo -en "Size: All other space\n"
+    echo -en "| Type: Linux filesystem\n"
+    echo -en "| Size: All other space\n"
     echo -en "--------------------------------------------------\n"
     echo -en "WARNING!!! all data on /dev/$archdisk will be REMOVED\n"
     echo -en "The answer \"No\" will terminate the script execution\n"
@@ -81,7 +82,7 @@ do
 	    Yes | yes | Yep | yep | Y | y) echo "Preparing the disk ..."
 	    sleep 2
 	    wipefs -af /dev/$archdisk
-		gdisk /dev/$archdisk
+		cfdisk /dev/$archdisk
 	    break;;
 	    No | no | Nope | nope | N | n) echo "The script is closed ..."
 	    sleep 2
