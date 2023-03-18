@@ -544,7 +544,7 @@ Please << umount -a >> all devices and << reboot >> in to the new system!!!
 -------------------------------------------------------------------------------
 "; echo
 else
-    ${bootctl_install}
+#    ${bootctl_install}
     arch-chroot /mnt /bin/bash -c "bootctl --esp-path=/efi --boot-path=/boot install"
     arch-chroot /mnt /bin/bash -c "echo 'timeout menu-force' > /efi/loader/loader.conf"
     arch-chroot /mnt /bin/bash -c "echo 'console-mode auto' >> /efi/loader/loader.conf"
