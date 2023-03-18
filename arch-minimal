@@ -543,7 +543,7 @@ read -r -sn1 -p "Initial ramdisk environment created, press any key to install b
 #-------------------------------------------------------------------------------
 if [[ "$boot_type" = "1" ]]; then
     ${grub_install}
-    arch-chroot /mnt /bin/bash -c "grub-install --target=x86_64-efi --efi-directory=/efi --boot-directory=/boot --bootloader-id=Linux Boot Manager"
+    arch-chroot /mnt /bin/bash -c "grub-install --efi-directory=/efi --boot-directory=/boot --bootloader-id=Linux Boot Manager"
     arch-chroot /mnt /bin/bash -c "grub-mkconfig -o /boot/grub/grub.cfg"
     read -r -sn1 -p "GRUB installed and configured
 -------------------------------------------------------------------------------
