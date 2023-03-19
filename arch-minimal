@@ -534,6 +534,7 @@ arch-chroot /mnt /bin/bash -c "pacman -Syy"
 arch-chroot /mnt /bin/bash -c "reflector --verbose --country 'Russia,Germany,' --latest 5 --sort rate --save /etc/pacman.d/mirrorlist"
 echo -en "--------------------------------------------------\n"
 read -r -sn1 -p "Pacman configured, press any key to generate ramdisk environment..."; echo
+echo -en "\n"
 #-------------------------------------------------------------------------------
 while true
 do
@@ -548,7 +549,7 @@ do
         arch-chroot /mnt /bin/bash -c "mkinitcpio -p linux"
         break;;
         2) echo "Chosen by you - dracut"
-        arch-chroot /mnt /bin/bash -c "dracut --hostonly --no-hostonly-cmdline /boot/initramfs-linux.img"
+        arch-chroot /mnt /bin/bash -c "dracut"
         break;;
         *) echo "Incorrect input. Try again ..." continue;;
     esac
