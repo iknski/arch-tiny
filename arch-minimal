@@ -356,7 +356,7 @@ clear
 #-------------------------------------------------------------------------------
 driver_install="pacstrap -K /mnt dkms linux-headers $cpu-ucode --noconfirm"
 boot_tools="pacstrap -K /mnt efibootmgr efitools memtest86+-efi os-prober --noconfirm"
-pkgs_install="pacstrap -K /mnt bash-completion pacman-contrib pkgfile --noconfirm"
+pkgs_install="pacstrap -Ki /mnt bash-completion pacman-contrib pkgfile --noconfirm"
 #-------------------------------------------------------------------------------
 echo -en "--------------------------------------------------\n"
 echo -en "One monent please, the setup is in progress...\n"
@@ -533,9 +533,27 @@ sed -i "/\[multilib\]/,/Include/"'s/^#//' /mnt/etc/pacman.conf
 arch-chroot /mnt /bin/bash -c "pacman -Syy"
 arch-chroot /mnt /bin/bash -c "reflector --verbose --country 'Russia,Germany,' --latest 5 --sort rate --save /etc/pacman.d/mirrorlist"
 echo -en "--------------------------------------------------\n"
-read -r -sn1 -p "Pacman configured, press any key ..."; echo
+read -r -sn1 -p "Pacman configured, press any key to generate ramdisk environment..."; echo
 #-------------------------------------------------------------------------------
-arch-chroot /mnt /bin/bash -c "mkinitcpio -p linux"
+while true
+do
+    echo -en "--------------------------------------------------\n"
+    echo -en "Which tool did you choose during installation\n"
+    echo -en "booster not supported by thise autoinstaller\n"
+    echo -en "--------------------------------------------------\n"
+    echo -en "| 1 - mkinitcpio\n| 2 - dracut\n"
+    read -r -p "| Your choise (1/2): >>> " tool_type
+    case $tool_type in
+        1) echo "chosen by you - mkinitcpio"
+        arch-chroot /mnt /bin/bash -c "mkinitcpio -p linux"
+        break;;
+        2) echo "Chosen by you - dracut"
+        arch-chroot /mnt /bin/bash -c "dracut --hostonly --no-hostonly-cmdline /boot/initramfs-linux.img"
+        break;;
+        *) echo "Incorrect input. Try again ..." continue;;
+    esac
+done
+#-------------------------------------------------------------------------------
 echo -en "--------------------------------------------------\n"
 read -r -sn1 -p "Initial ramdisk environment created, press any key to install bootloader
 --------------------------------------------------
