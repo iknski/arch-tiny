@@ -82,7 +82,7 @@ do
 	    Yes | yes | Yep | yep | Y | y) echo "Preparing the disk ..."
 	    sleep 2
 	    wipefs -af /dev/$archdisk
-		cfdisk /dev/$archdisk
+		gdisk /dev/$archdisk
 	    break;;
 	    No | no | Nope | nope | N | n) echo "The script is closed ..."
 	    sleep 2
