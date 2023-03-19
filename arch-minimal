@@ -413,7 +413,7 @@ touch /mnt/etc/X11/xorg.conf.d/00-keyboard.conf
 echo -en "--------------------------------------------------\n"
 echo -en "Starting Arch Linux installation\n"
 echo -en "--------------------------------------------------\n"
-pacstrap -Ki /mnt base base-devel linux linux-firmware reflector rsync git openssh micro
+pacstrap -K /mnt base base-devel linux linux-firmware reflector rsync git openssh micro
 echo -en "--------------------------------------------------\n"
 read -r -sn1 -p "The base Arch Linux packages have been installed...
 press any key to apply system settings
@@ -475,7 +475,7 @@ read -r -sn1 -p "Hosts settings applied, press any key to install bootloader, dr
 #-------------------------------------------------------------------------------
 if [[ "$fs_type" = "1" ]]; then
     pacstrap -K /mnt btrfs-progs --noconfirm
-#    arch-chroot /mnt /bin/bash -c "sed -i s/'MODULES=()'/'MODULES=(crc32c libcrc32c zlib_deflate btrfs)'/g /etc/mkinitcpio.conf"
+    arch-chroot /mnt /bin/bash -c "sed -i s/'MODULES=()'/'MODULES=(crc32c libcrc32c zlib_deflate btrfs)'/g /etc/mkinitcpio.conf"
 else
     pacstrap -K /mnt e2fsprogs --noconfirm
 fi
@@ -536,25 +536,26 @@ echo -en "--------------------------------------------------\n"
 read -r -sn1 -p "Pacman configured, press any key to generate ramdisk environment..."; echo
 echo -en "\n"
 #-------------------------------------------------------------------------------
-while true
-do
-    echo -en "--------------------------------------------------\n"
-    echo -en "Which tool did you choose during installation\n"
-    echo -en "booster not supported by thise autoinstaller\n"
-    echo -en "--------------------------------------------------\n"
-    echo -en "| 1 - mkinitcpio\n| 2 - dracut\n"
-    read -r -p "| Your choise (1/2): >>> " tool_type
-    case $tool_type in
-        1) echo "chosen by you - mkinitcpio"
-        arch-chroot /mnt /bin/bash -c "mkinitcpio -p linux"
-        break;;
-        2) echo "Chosen by you - dracut"
-        arch-chroot /mnt /bin/bash -c "dracut"
-        break;;
-        *) echo "Incorrect input. Try again ..." continue;;
-    esac
-done
+# while true
+# do
+#     echo -en "--------------------------------------------------\n"
+#     echo -en "Which tool did you choose during installation\n"
+#     echo -en "booster not supported by thise autoinstaller\n"
+#     echo -en "--------------------------------------------------\n"
+#     echo -en "| 1 - mkinitcpio\n| 2 - dracut\n"
+#     read -r -p "| Your choise (1/2): >>> " tool_type
+#     case $tool_type in
+#         1) echo "chosen by you - mkinitcpio"
+#         arch-chroot /mnt /bin/bash -c "mkinitcpio -p linux"
+#         break;;
+#         2) echo "Chosen by you - dracut"
+#         arch-chroot /mnt /bin/bash -c "dracut"
+#         break;;
+#         *) echo "Incorrect input. Try again ..." continue;;
+#     esac
+# done
 #-------------------------------------------------------------------------------
+arch-chroot /mnt /bin/bash -c "mkinitcpio -p linux"
 echo -en "--------------------------------------------------\n"
 read -r -sn1 -p "Initial ramdisk environment created, press any key to install bootloader
 --------------------------------------------------
