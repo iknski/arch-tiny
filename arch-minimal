@@ -475,7 +475,7 @@ read -r -sn1 -p "Hosts settings applied, press any key to install bootloader, dr
 #-------------------------------------------------------------------------------
 if [[ "$fs_type" = "1" ]]; then
     pacstrap -K /mnt btrfs-progs --noconfirm
-    arch-chroot /mnt /bin/bash -c "sed -i s/'MODULES=()'/'MODULES=(crc32c libcrc32c zlib_deflate btrfs)'/g /etc/mkinitcpio.conf"
+#    arch-chroot /mnt /bin/bash -c "sed -i s/'MODULES=()'/'MODULES=(crc32c libcrc32c zlib_deflate btrfs)'/g /etc/mkinitcpio.conf"
 else
     pacstrap -K /mnt e2fsprogs --noconfirm
 fi
@@ -562,7 +562,7 @@ read -r -sn1 -p "Initial ramdisk environment created, press any key to install b
 ${boot_tools}
 if [[ "$boot_type" = "1" ]]; then
     pacstrap -K /mnt grub --noconfirm
-    arch-chroot /mnt /bin/bash -c "grub-install --efi-directory=/efi --boot-directory=/boot --bootloader-id=\"GRUB Boot Manager\""
+    arch-chroot /mnt /bin/bash -c "grub-install --efi-directory=/efi --boot-directory=/boot --bootloader-id=\"Linux Boot Manager\""
     arch-chroot /mnt /bin/bash -c "grub-mkconfig -o /boot/grub/grub.cfg"
     read -r -sn1 -p "GRUB installed and configured
 -------------------------------------------------------------------------------
@@ -571,7 +571,7 @@ Please << umount -a >> all devices and << reboot >> in to the new system!!!
 -------------------------------------------------------------------------------
 "; echo
 else
-    arch-chroot /mnt /bin/bash -c "bootctl --esp-path=/efi --boot-path=/boot install --efi-boot-option-description=\"Systemd Boot Manager\""
+    arch-chroot /mnt /bin/bash -c "bootctl --esp-path=/efi --boot-path=/boot install --efi-boot-option-description=\"Linux Boot Manager\""
     arch-chroot /mnt /bin/bash -c "echo 'timeout menu-force' > /efi/loader/loader.conf"
     arch-chroot /mnt /bin/bash -c "echo 'console-mode auto' >> /efi/loader/loader.conf"
     arch-chroot /mnt /bin/bash -c "echo 'editor no' >> /efi/loader/loader.conf"
@@ -588,8 +588,8 @@ else
         arch-chroot /mnt /bin/bash -c "echo 'options    rw root=\"LABEL=ROOT\" quiet splash loglevel=3 nowatchdog rootfstype=btrfs rootflags=subvol=@' >> /boot/loader/entries/arch.conf"
         arch-chroot /mnt /bin/bash -c "echo 'options    rw root=\"LABEL=ROOT\" quiet splash loglevel=3 nowatchdog rootfstype=btrfs rootflags=subvol=@' >> /boot/loader/entries/arch-fb.conf"
     else
-        arch-chroot /mnt /bin/bash -c "echo 'options    rw root=\"LABEL=ROOT\" quiet splash loglevel=3 nowatchdog' >> /boot/loader/entries/arch.conf"
-        arch-chroot /mnt /bin/bash -c "echo 'options    rw root=\"LABEL=ROOT\" quiet splash loglevel=3 nowatchdog' >> /boot/loader/entries/arch-fb.conf"
+        arch-chroot /mnt /bin/bash -c "echo 'options    rw root=\"LABEL=ROOT\" quiet splash loglevel=3 nowatchdog rootfstype=ext4' >> /boot/loader/entries/arch.conf"
+        arch-chroot /mnt /bin/bash -c "echo 'options    rw root=\"LABEL=ROOT\" quiet splash loglevel=3 nowatchdog rootfstype=ext4' >> /boot/loader/entries/arch-fb.conf"
     fi
     echo -en "Check your bootloader ...\n"
     echo -en "--------------------------------------------------\n"
