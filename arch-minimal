@@ -6,7 +6,7 @@
 # License   : The MIT License (https://opensource.org/license/mit/)
 # Version   : v 2.0
 # --------------------------------------------------
-# 18.03.2023
+# 25.03.2023
 
 clear
 
@@ -62,12 +62,12 @@ do
     echo -en "Create the partitions:\n"
     echo -en "**********************\n"
     echo -en "ESP (EFI system partition)\n"
-    echo -en "| Type: EFI System (ef00)\n"
+    echo -en "| Type: EFI System (EF00)\n"
     echo -en "| Size: ~100M\n"
     echo -en "--------------------------------------------------\n"
     echo -en "BOOT\n"
     echo -en "| Type: Linux extended boot (EA00)\n"
-    echo -en "| Size: At your discretion ~300M\n"
+    echo -en "| Size: At your discretion ~300M or more\n"
     echo -en "--------------------------------------------------\n"
     echo -en "ROOT\n"
     echo -en "| Type: Linux filesystem (8300)\n"
@@ -82,7 +82,7 @@ do
 	    Yes | yes | Yep | yep | Y | y) echo "Preparing the disk ..."
 	    sleep 2
 	    wipefs -af /dev/$archdisk
-		gdisk /dev/$archdisk
+		cfdisk /dev/$archdisk
 	    break;;
 	    No | no | Nope | nope | N | n) echo "The script is closed ..."
 	    sleep 2
@@ -135,9 +135,13 @@ echo -en "--------------------------------------------------\n"
 read -r -p "| create directory -> /. >>> " adddir
 #-------------------------------------------------------------------------------
 mkfs.vfat -F32 /dev/$esp
+wait
 fatlabel /dev/$esp ESP
+wait
 mkfs.vfat -F32 /dev/$boot
+wait
 fatlabel /dev/$boot BOOT
+wait
 if [ -n "$swap" ]; then
     mkswap /dev/$swap
     swapon /dev/$swap
@@ -152,7 +156,9 @@ do
     case $fs_type in
         1) echo "File system selected - BTRFS"
         mkfs.btrfs -f /dev/$root
+        wait
         btrfs filesystem label /dev/$root ROOT
+        wait
 		read -r -p "select the \"zstd\" compression level ( from 1 to 15 ) >>> " clvl
 		mount  /dev/$root /mnt
 		btrfs subvolume create /mnt/@
@@ -174,7 +180,9 @@ do
         break;;
         2) echo "File system selected - EXT4"
         mkfs.ext4 -F /dev/$root
+        wait
         e2label /dev/$root ROOT
+        wait
         mount  /dev/$root /mnt
         mkdir -p /mnt/{home,$adddir}
         break;;
@@ -413,7 +421,7 @@ touch /mnt/etc/X11/xorg.conf.d/00-keyboard.conf
 echo -en "--------------------------------------------------\n"
 echo -en "Starting Arch Linux installation\n"
 echo -en "--------------------------------------------------\n"
-pacstrap -Ki /mnt base base-devel linux linux-firmware reflector rsync git openssh micro
+pacstrap -K /mnt base base-devel linux linux-firmware reflector rsync git openssh micro
 echo -en "--------------------------------------------------\n"
 read -r -sn1 -p "The base Arch Linux packages have been installed...
 press any key to apply system settings
@@ -421,7 +429,7 @@ press any key to apply system settings
 "; echo
 clear
 #-------------------------------------------------------------------------------
-genfstab -U -p /mnt >> /mnt/etc/fstab
+genfstab -U /mnt >> /mnt/etc/fstab
 arch-chroot /mnt /bin/bash -c "cat /etc/fstab"
 echo -en "--------------------------------------------------\n"
 read -r -sn1 -p "Filesystem table generated, press any key to continue
@@ -475,7 +483,7 @@ read -r -sn1 -p "Hosts settings applied, press any key to install bootloader, dr
 #-------------------------------------------------------------------------------
 if [[ "$fs_type" = "1" ]]; then
     pacstrap -K /mnt btrfs-progs --noconfirm
-#    arch-chroot /mnt /bin/bash -c "sed -i s/'MODULES=()'/'MODULES=(crc32c libcrc32c zlib_deflate btrfs)'/g /etc/mkinitcpio.conf"
+    arch-chroot /mnt /bin/bash -c "sed -i s/'MODULES=()'/'MODULES=(crc32c libcrc32c zlib_deflate btrfs)'/g /etc/mkinitcpio.conf"
 else
     pacstrap -K /mnt e2fsprogs --noconfirm
 fi
@@ -536,24 +544,7 @@ echo -en "--------------------------------------------------\n"
 read -r -sn1 -p "Pacman configured, press any key to generate ramdisk environment..."; echo
 echo -en "\n"
 #-------------------------------------------------------------------------------
-while true
-do
-    echo -en "--------------------------------------------------\n"
-    echo -en "Which tool did you choose during installation\n"
-    echo -en "booster not supported by thise autoinstaller\n"
-    echo -en "--------------------------------------------------\n"
-    echo -en "| 1 - mkinitcpio\n| 2 - dracut\n"
-    read -r -p "| Your choise (1/2): >>> " tool_type
-    case $tool_type in
-        1) echo "chosen by you - mkinitcpio"
-        arch-chroot /mnt /bin/bash -c "mkinitcpio -p linux"
-        break;;
-        2) echo "Chosen by you - dracut"
-        arch-chroot /mnt /bin/bash -c "dracut --force"
-        break;;
-        *) echo "Incorrect input. Try again ..." continue;;
-    esac
-done
+arch-chroot /mnt /bin/bash -c "mkinitcpio -p linux"
 #-------------------------------------------------------------------------------
 echo -en "--------------------------------------------------\n"
 read -r -sn1 -p "Initial ramdisk environment created, press any key to install bootloader
