@@ -421,7 +421,7 @@ touch /mnt/etc/X11/xorg.conf.d/00-keyboard.conf
 echo -en "--------------------------------------------------\n"
 echo -en "Starting Arch Linux installation\n"
 echo -en "--------------------------------------------------\n"
-pacstrap -K /mnt base base-devel linux linux-firmware reflector rsync git openssh micro
+pacstrap -Ki /mnt base base-devel linux linux-firmware reflector rsync git openssh micro
 echo -en "--------------------------------------------------\n"
 read -r -sn1 -p "The base Arch Linux packages have been installed...
 press any key to apply system settings
@@ -544,7 +544,26 @@ echo -en "--------------------------------------------------\n"
 read -r -sn1 -p "Pacman configured, press any key to generate ramdisk environment..."; echo
 echo -en "\n"
 #-------------------------------------------------------------------------------
-arch-chroot /mnt /bin/bash -c "mkinitcpio -p linux"
+while true
+do
+    echo -en "--------------------------------------------------\n"
+    echo -en "Select the tool to generate initramfs\n"
+    echo -en "--------------------------------------------------\n"
+    echo -en "| 1 - mkinitcpio\n| 2 - dracut\n"
+    read -r -p "| Your choise (1/2): >>> " initramfs_type
+    case $initramfs_type in
+        1) echo "Selected - mkinitcpio"
+        arch-chroot /mnt /bin/bash -c "mkinitcpio -p linux"
+        break;;
+        2) echo "Selected - dracut"
+        exit
+        break;;
+        *) echo "Incorrect input. Try again ..." continue;;
+    esac
+done
+
+
+# arch-chroot /mnt /bin/bash -c "mkinitcpio -p linux"
 #-------------------------------------------------------------------------------
 echo -en "--------------------------------------------------\n"
 read -r -sn1 -p "Initial ramdisk environment created, press any key to install bootloader
