@@ -421,7 +421,7 @@ touch /mnt/etc/X11/xorg.conf.d/00-keyboard.conf
 echo -en "--------------------------------------------------\n"
 echo -en "Starting Arch Linux installation\n"
 echo -en "--------------------------------------------------\n"
-pacstrap -Ki /mnt base base-devel linux linux-firmware reflector rsync git openssh micro
+pacstrap -K /mnt base base-devel linux linux-firmware reflector rsync git openssh micro
 echo -en "--------------------------------------------------\n"
 read -r -sn1 -p "The base Arch Linux packages have been installed...
 press any key to apply system settings
