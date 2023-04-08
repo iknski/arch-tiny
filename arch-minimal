@@ -363,7 +363,9 @@ done
 #-------------------------------------------------------------------------------
 while true
 do
+    echo -en "--------------------------------------------------\n"
     echo -en "Choose a tool to create initramfs\n"
+    echo -en "--------------------------------------------------\n"
     echo -en "1 - mkinitcpio\n2 - dracut\n"
     read -r -p "| Your choise: >>> " tool_type
     case $fs_type in
@@ -440,9 +442,9 @@ if [[ "$tool_type" = "1" ]]; then
     pacstrap -Ki /mnt base base-devel linux linux-firmware reflector rsync git openssh micro
     echo -en "--------------------------------------------------\n"
     read -r -sn1 -p "The base Arch Linux packages have been installed...
-    press any key to apply system settings
-    --------------------------------------------------
-    "; echo
+press any key to apply system settings
+--------------------------------------------------
+"; echo
 else
     echo -en "--------------------------------------------------\n"
     echo -en "Starting Arch Linux installation\n"
@@ -455,66 +457,75 @@ else
     touch /mnt/usr/local/bin/dracut-remove.sh
     touch /mnt/etc/pacman.d/hooks/90-dracut-install.hook
     touch /mnt/etc/pacman.d/hooks/60-dracut-remove.hook
+    #---------------------------------------------------------------------------
+    {
+        echo "#!/usr/bin/env bash"
+        echo ""
+        echo "args=('--force' '--no-hostonly-cmdline')"
+        echo ""
+        echo "while read -r line; do"
+        echo "    if [[ \"\$line\" == 'usr/lib/modules/'+([^/])'/pkgbase' ]]; then"
+        echo "        read -r pkgbase < \"/\${line}\""
+        echo "        kver=\"\${line#'usr/lib/modules/'}\""
+        echo "        kver=\"\${kver%'/pkgbase'}\""
+        echo ""
+        echo "        install -Dm0644 \"/\${line%'/pkgbase'}/vmlinuz\" \"/boot/vmlinuz-\${pkgbase}\""
+        echo "        dracut \"\${args[@]}\" --hostonly \"/boot/initramfs-\${pkgbase}.img\" --kver \"\$kver\""
+        echo "        dracut \"\${args[@]}\" --no-hostonly \"/boot/initramfs-\${pkgbase}-fallback.img\" --kver \"\$kver\""
+        echo "    fi"
+        echo "done"
+    } >> mnt/usr/local/bin/dracut-install.sh
+    #---------------------------------------------------------------------------
+    {
+        echo "#!/usr/bin/env bash"
+        echo ""
+        echo "while read -r line; do"
+        echo "    if [[ \"\$line\" == 'usr/lib/modules/'+([^/])'/pkgbase' ]]; then"
+        echo "        read -r pkgbase < \"/\${line}\""
+        echo "        rm -f \"/boot/vmlinuz-\${pkgbase}\" \"/boot/initramfs-\${pkgbase}.img\" \"/boot/initramfs-\${pkgbase}-fallback.img\""
+        echo "    fi"
+        echo "done"
+    }  >> mnt/usr/local/bin/dracut-remove.sh
+    #---------------------------------------------------------------------------
+    {
+        echo "[Trigger]"
+        echo "Type = Path"
+        echo "Operation = Install"
+        echo "Operation = Upgrade"
+        echo "Target = usr/lib/modules/*/pkgbase"
+        echo ""
+        echo "[Action]"
+        echo "Description = Updating linux initcpios (with dracut!)..."
+        echo "When = PostTransaction"
+        echo "Exec = /usr/local/bin/dooks/90-dracut-install.hook"
+        echo "Depends = dracut"
+        echo "NeedsTargets"
+    } >> mnt/etc/pacman.d/hooks/90-dracut-install.hook
+    #---------------------------------------------------------------------------
+    {
+        echo "[Trigger]"
+        echo "Type = Path"
+        echo "Operation = Remove"
+        echo "Target = usr/lib/modules/*/pkgbase"
+        echo ""
+        echo "[Action]"
+        echo "Description = Removing linux initcpios..."
+        echo "When = PreTransaction"
+        echo "Exec = /usr/local/bin/dracut-remove.sh"
+        echo "NeedsTargets"
+    } >> mnt/etc/pacman.d/hooks/60-dracut-remove.hook
+    #---------------------------------------------------------------------------
     chmod +x /mnt/usr/local/bin/dracut-install.sh
     chmod +x /mnt/usr/local/bin/dracut-remove.sh
     chmod +x /mnt/etc/pacman.d/hooks/90-dracut-install.hook
     chmod +x /mnt/etc/pacman.d/hooks/60-dracut-remove.hook
     #---------------------------------------------------------------------------
-    arch-chroot /mnt /bin/bash -c "echo '#!/usr/bin/env bash' > /usr/local/bin/dracut-install.sh"
-    arch-chroot /mnt /bin/bash -c "echo '' >> /usr/local/bin/dracut-install.sh"
-    arch-chroot /mnt /bin/bash -c "echo 'args=(\"--force\" \"--no-hostonly-cmdline\")' >> /usr/local/bin/dracut-install.sh"
-    arch-chroot /mnt /bin/bash -c "echo '' >> /usr/local/bin/dracut-install.sh"
-    arch-chroot /mnt /bin/bash -c "echo 'while read -r line; do' >> /usr/local/bin/dracut-install.sh"
-    arch-chroot /mnt /bin/bash -c "echo '   if [[ \"\$line\" == 'usr/lib/modules/'+([^/])'/pkgbase' ]]; then' >> /usr/local/bin/dracut-install.sh"
-    arch-chroot /mnt /bin/bash -c "echo '       read -r pkgbase < \"/\${line}\"' >> /usr/local/bin/dracut-install.sh"
-    arch-chroot /mnt /bin/bash -c "echo '       kver=\"\${line#'usr/lib/modules/'}\"' >> /usr/local/bin/dracut-install.sh"
-    arch-chroot /mnt /bin/bash -c "echo '       kver=\"\${kver%'/pkgbase'}\"' >> /usr/local/bin/dracut-install.sh"
-    arch-chroot /mnt /bin/bash -c "echo '' >> /usr/local/bin/dracut-install.sh"
-    arch-chroot /mnt /bin/bash -c "echo '       install -Dm0644 \"/\${line%'/pkgbase'}/vmlinuz\" \"/boot/vmlinuz-\${pkgbase}\"' >> /usr/local/bin/dracut-install.sh"
-    arch-chroot /mnt /bin/bash -c "echo '       dracut \"\${args[@]}\" --hostonly \"/boot/initramfs-\${pkgbase}.img\" --kver \"\$kver\"' >> /usr/local/bin/dracut-install.sh"
-    arch-chroot /mnt /bin/bash -c "echo '       dracut \"\${args[@]}\" --no-hostonly \"/boot/initramfs-\${pkgbase}-fallback.img\" --kver \"\$kver\"' >> /usr/local/bin/dracut-install.sh"
-    arch-chroot /mnt /bin/bash -c "echo '   fi' >> /usr/local/bin/dracut-install.sh"
-    arch-chroot /mnt /bin/bash -c "echo 'done' >> /usr/local/bin/dracut-install.sh"
-    #---------------------------------------------------------------------------
-    arch-chroot /mnt /bin/bash -c "echo '#!/usr/bin/env bash' > /usr/local/bin/dracut-remove.sh"
-    arch-chroot /mnt /bin/bash -c "echo '' >> /usr/local/bin/dracut-remove.sh"
-    arch-chroot /mnt /bin/bash -c "echo 'while read -r line; do' >> /usr/local/bin/dracut-remove.sh"
-    arch-chroot /mnt /bin/bash -c "echo '	if [[ \"\$line\" == 'usr/lib/modules/'+([^/])'/pkgbase' ]]; then' >> /usr/local/bin/dracut-remove.sh"
-    arch-chroot /mnt /bin/bash -c "echo '		read -r pkgbase < \"/\${line}\"' >> /usr/local/bin/dracut-remove.sh"
-    arch-chroot /mnt /bin/bash -c "echo '		rm -f \"/boot/vmlinuz-\${pkgbase}\" \"/boot/initramfs-\${pkgbase}.img\" \"/boot/initramfs-\${pkgbase}-fallback.img\"' >> /usr/local/bin/dracut-remove.sh"
-    arch-chroot /mnt /bin/bash -c "echo '	fi' >> /usr/local/bin/dracut-remove.sh"
-    arch-chroot /mnt /bin/bash -c "echo 'done' >> /usr/local/bin/dracut-remove.sh"
-    #---------------------------------------------------------------------------
-    arch-chroot /mnt /bin/bash -c "echo '[Trigger]' > /etc/pacman.d/hooks/90-dracut-install.hook"
-    arch-chroot /mnt /bin/bash -c "echo 'Type = Path' >> /etc/pacman.d/hooks/90-dracut-install.hook"
-    arch-chroot /mnt /bin/bash -c "echo 'Operation = Install' >> /etc/pacman.d/hooks/90-dracut-install.hook"
-    arch-chroot /mnt /bin/bash -c "echo 'Operation = Upgrade' >> /etc/pacman.d/hooks/90-dracut-install.hook"
-    arch-chroot /mnt /bin/bash -c "echo 'Target = usr/lib/modules/*/pkgbase' >> /etc/pacman.d/hooks/90-dracut-install.hook"
-    arch-chroot /mnt /bin/bash -c "echo '' >> /etc/pacman.d/hooks/90-dracut-install.hook"
-    arch-chroot /mnt /bin/bash -c "echo '[Action]' >> /etc/pacman.d/hooks/90-dracut-install.hook"
-    arch-chroot /mnt /bin/bash -c "echo 'Description = Updating linux initcpios (with dracut!)...' >> /etc/pacman.d/hooks/90-dracut-install.hook"
-    arch-chroot /mnt /bin/bash -c "echo 'When = PostTransaction' >> /etc/pacman.d/hooks/90-dracut-install.hook"
-    arch-chroot /mnt /bin/bash -c "echo 'Exec = /usr/local/bin/dracut-install.sh' >> /etc/pacman.d/hooks/90-dracut-install.hook"
-    arch-chroot /mnt /bin/bash -c "echo 'Depends = dracut' >> /etc/pacman.d/hooks/90-dracut-install.hook"
-    arch-chroot /mnt /bin/bash -c "echo 'NeedsTargets' >> /etc/pacman.d/hooks/90-dracut-install.hook"
-    #---------------------------------------------------------------------------
-    arch-chroot /mnt /bin/bash -c "echo '[Trigger]' > /etc/pacman.d/hooks/60-dracut-remove.hook"
-    arch-chroot /mnt /bin/bash -c "echo 'Type = Path' >> /etc/pacman.d/hooks/60-dracut-remove.hook"
-    arch-chroot /mnt /bin/bash -c "echo 'Operation = Remove' >> /etc/pacman.d/hooks/60-dracut-remove.hook"
-    arch-chroot /mnt /bin/bash -c "echo 'Target = usr/lib/modules/*/pkgbase' >> /etc/pacman.d/hooks/60-dracut-remove.hook"
-    arch-chroot /mnt /bin/bash -c "echo '' >> /etc/pacman.d/hooks/60-dracut-remove.hook"
-    arch-chroot /mnt /bin/bash -c "echo '[Action]' >> /etc/pacman.d/hooks/60-dracut-remove.hook"
-    arch-chroot /mnt /bin/bash -c "echo 'Description = Removing linux initcpios...' >> /etc/pacman.d/hooks/60-dracut-remove.hook"
-    arch-chroot /mnt /bin/bash -c "echo 'When = PreTransaction' >> /etc/pacman.d/hooks/60-dracut-remove.hook"
-    arch-chroot /mnt /bin/bash -c "echo 'Exec = /usr/local/bin/dracut-remove.sh' >> /etc/pacman.d/hooks/60-dracut-remove.hook"
-    arch-chroot /mnt /bin/bash -c "echo 'NeedsTargets' >> /etc/pacman.d/hooks/60-dracut-remove.hook"
-    #---------------------------------------------------------------------------
     pacstrap -Ki /mnt base base-devel linux linux-firmware reflector rsync git openssh micro
     echo -en "--------------------------------------------------\n"
     read -r -sn1 -p "The base Arch Linux packages have been installed...
-    press any key to apply system settings
-    --------------------------------------------------
-    "; echo
+press any key to apply system settings
+--------------------------------------------------
+"; echo
 fi
 clear
 #-------------------------------------------------------------------------------
