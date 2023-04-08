@@ -474,7 +474,7 @@ else
         echo "        dracut \"\${args[@]}\" --no-hostonly \"/boot/initramfs-\${pkgbase}-fallback.img\" --kver \"\$kver\""
         echo "    fi"
         echo "done"
-    } >> mnt/usr/local/bin/dracut-install.sh
+    } >> /mnt/usr/local/bin/dracut-install.sh
     #---------------------------------------------------------------------------
     {
         echo "#!/usr/bin/env bash"
@@ -485,7 +485,7 @@ else
         echo "        rm -f \"/boot/vmlinuz-\${pkgbase}\" \"/boot/initramfs-\${pkgbase}.img\" \"/boot/initramfs-\${pkgbase}-fallback.img\""
         echo "    fi"
         echo "done"
-    }  >> mnt/usr/local/bin/dracut-remove.sh
+    }  >> /mnt/usr/local/bin/dracut-remove.sh
     #---------------------------------------------------------------------------
     {
         echo "[Trigger]"
@@ -500,7 +500,7 @@ else
         echo "Exec = /usr/local/bin/dooks/90-dracut-install.hook"
         echo "Depends = dracut"
         echo "NeedsTargets"
-    } >> mnt/etc/pacman.d/hooks/90-dracut-install.hook
+    } >> /mnt/etc/pacman.d/hooks/90-dracut-install.hook
     #---------------------------------------------------------------------------
     {
         echo "[Trigger]"
@@ -513,7 +513,7 @@ else
         echo "When = PreTransaction"
         echo "Exec = /usr/local/bin/dracut-remove.sh"
         echo "NeedsTargets"
-    } >> mnt/etc/pacman.d/hooks/60-dracut-remove.hook
+    } >> /mnt/etc/pacman.d/hooks/60-dracut-remove.hook
     #---------------------------------------------------------------------------
     chmod +x /mnt/usr/local/bin/dracut-install.sh
     chmod +x /mnt/usr/local/bin/dracut-remove.sh
