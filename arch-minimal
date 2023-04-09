@@ -451,6 +451,12 @@ else
     echo -en "Before installing, select the tool to create initramfs that you indicated earlier!!!\n"
     echo -en "--------------------------------------------------\n"
     #---------------------------------------------------------------------------
+    ls -la /mnt/
+    echo -en "--------------------------------------------------\n"
+    read -r -sn1 -p "press any key to continue ...
+--------------------------------------------------
+"; echo
+    #---------------------------------------------------------------------------
     mkdir -p /mnt/usr/local/bin
     mkdir -p /mnt/etc/pacman.d/hooks
     touch /mnt/usr/local/bin/dracut-install.sh
@@ -476,6 +482,12 @@ else
         echo "done"
     } >> /mnt/usr/local/bin/dracut-install.sh
     #---------------------------------------------------------------------------
+    cat /mnt/usr/local/bin/dracut-install.sh
+    echo -en "--------------------------------------------------\n"
+    read -r -sn1 -p "press any key to continue ...
+--------------------------------------------------
+"; echo
+    #---------------------------------------------------------------------------
     {
         echo "#!/usr/bin/env bash"
         echo ""
@@ -486,6 +498,12 @@ else
         echo "    fi"
         echo "done"
     }  >> /mnt/usr/local/bin/dracut-remove.sh
+    #---------------------------------------------------------------------------
+    cat /mnt/usr/local/bin/dracut-remove.sh
+    echo -en "--------------------------------------------------\n"
+    read -r -sn1 -p "press any key to continue ...
+--------------------------------------------------
+"; echo
     #---------------------------------------------------------------------------
     {
         echo "[Trigger]"
@@ -502,6 +520,12 @@ else
         echo "NeedsTargets"
     } >> /mnt/etc/pacman.d/hooks/90-dracut-install.hook
     #---------------------------------------------------------------------------
+    cat /mnt/etc/pacman.d/hooks/90-dracut-install.hook
+    echo -en "--------------------------------------------------\n"
+    read -r -sn1 -p "press any key to continue ...
+--------------------------------------------------
+"; echo
+    #---------------------------------------------------------------------------
     {
         echo "[Trigger]"
         echo "Type = Path"
@@ -514,6 +538,12 @@ else
         echo "Exec = /usr/local/bin/dracut-remove.sh"
         echo "NeedsTargets"
     } >> /mnt/etc/pacman.d/hooks/60-dracut-remove.hook
+    #---------------------------------------------------------------------------
+    cat /mnt/etc/pacman.d/hooks/60-dracut-remove.hook
+    echo -en "--------------------------------------------------\n"
+    read -r -sn1 -p "press any key to continue ...
+--------------------------------------------------
+"; echo
     #---------------------------------------------------------------------------
     chmod +x /mnt/usr/local/bin/dracut-install.sh
     chmod +x /mnt/usr/local/bin/dracut-remove.sh
