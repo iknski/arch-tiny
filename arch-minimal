@@ -551,8 +551,8 @@ else
     chmod +x /mnt/etc/pacman.d/hooks/60-dracut-remove.hook
     #---------------------------------------------------------------------------
     pacstrap -Ki /mnt base base-devel reflector rsync git openssh micro
-    echo -en "--------------------------------------------------\n"
     arch-chroot /mnt /bin/bash -c "pacman -S linux linux-firmware"
+    echo -en "--------------------------------------------------\n"
     read -r -sn1 -p "The base Arch Linux packages have been installed...
 press any key to apply system settings
 --------------------------------------------------
