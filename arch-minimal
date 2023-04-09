@@ -515,7 +515,7 @@ else
         echo "[Action]"
         echo "Description = Updating linux initcpios (with dracut!)..."
         echo "When = PostTransaction"
-        echo "Exec = /usr/local/bin/dooks/90-dracut-install.hook"
+        echo "Exec = /usr/local/bin/dracut-install.sh"
         echo "Depends = dracut"
         echo "NeedsTargets"
     } >> /mnt/etc/pacman.d/hooks/90-dracut-install.hook
