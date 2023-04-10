@@ -655,20 +655,20 @@ sed -i "/\[multilib\]/,/Include/"'s/^#//' /mnt/etc/pacman.conf
 arch-chroot /mnt /bin/bash -c "pacman -Syy"
 arch-chroot /mnt /bin/bash -c "reflector --verbose --country 'Russia,Germany,' --latest 5 --sort rate --save /etc/pacman.d/mirrorlist"
 echo -en "--------------------------------------------------\n"
-read -r -sn1 -p "Pacman configured, press any key to generate ramdisk environment..."; echo
+read -r -sn1 -p "Pacman configured, press any key to install bootloader..."; echo
 echo -en "\n"
 #-------------------------------------------------------------------------------
-if [[ "$tool_type" = "1" ]]; then
-    arch-chroot /mnt /bin/bash -c "mkinitcpio -p linux"
-else
-    arch-chroot /mnt /bin/bash -c "dracut --force --hostonly --no-hostonly-cmdline /boot/initramfs-linux.img"
-    arch-chroot /mnt /bin/bash -c "dracut --force /boot/initramfs-linux-fallback.img"
-fi
+# if [[ "$tool_type" = "1" ]]; then
+#     arch-chroot /mnt /bin/bash -c "mkinitcpio -p linux"
+# else
+#     arch-chroot /mnt /bin/bash -c "dracut --force --hostonly --no-hostonly-cmdline /boot/initramfs-linux.img"
+#     arch-chroot /mnt /bin/bash -c "dracut --force /boot/initramfs-linux-fallback.img"
+# fi
 #-------------------------------------------------------------------------------
-echo -en "--------------------------------------------------\n"
-read -r -sn1 -p "Initial ramdisk environment created, press any key to install bootloader
---------------------------------------------------
-"; echo
+# echo -en "--------------------------------------------------\n"
+# read -r -sn1 -p "Initial ramdisk environment created, press any key to install bootloader
+# --------------------------------------------------
+# "; echo
 #-------------------------------------------------------------------------------
 ${boot_tools}
 if [[ "$boot_type" = "1" ]]; then
@@ -684,25 +684,25 @@ Please << umount -a >> all devices and << reboot >> in to the new system!!!
 else
     arch-chroot /mnt /bin/bash -c "bootctl --esp-path=/efi --boot-path=/boot install --efi-boot-option-description=\"Linux Boot Manager\""
     {
-        arch-chroot /mnt /bin/bash -c "echo 'timeout menu-force'"
-        arch-chroot /mnt /bin/bash -c "echo 'console-mode auto'"
-        arch-chroot /mnt /bin/bash -c "echo 'editor no'"
-        arch-chroot /mnt /bin/bash -c "echo 'default arch.conf'"
-    } >> /efi/loader/loader.conf
+        echo "timeout menu-force"
+        echo "console-mode auto"
+        echo "editor no"
+        echo "default arch.conf"
+    } >> /mnt/efi/loader/loader.conf
     #---------------------------------------------------------------------------
     {
-        arch-chroot /mnt /bin/bash -c "echo 'title    Arch Linux'"
-        arch-chroot /mnt /bin/bash -c "echo 'linux    /vmlinuz-linux'"
-        arch-chroot /mnt /bin/bash -c "echo 'initrd    /$cpu-ucode.img'"
-        arch-chroot /mnt /bin/bash -c "echo 'initrd    /initramfs-linux.img'"
-    } >> /boot/loader/entries/arch.conf
+        echo "title    Arch Linux"
+        echo "linux    /vmlinuz-linux"
+        echo "initrd    /$cpu-ucode.img"
+        echo "initrd    /initramfs-linux.img"
+    } >> /mnt/boot/loader/entries/arch.conf
     #---------------------------------------------------------------------------
     {
-        arch-chroot /mnt /bin/bash -c "echo 'title    Arch Linux fallback'"
-        arch-chroot /mnt /bin/bash -c "echo 'linux    /vmlinuz-linux'"
-        arch-chroot /mnt /bin/bash -c "echo 'initrd    /$cpu-ucode.img'"
-        arch-chroot /mnt /bin/bash -c "echo 'initrd    /initramfs-linux-fallback.img'"
-    } >> /boot/loader/entries/arch-fb.conf
+        echo "title    Arch Linux fallback"
+        echo "linux    /vmlinuz-linux"
+        echo "initrd    /$cpu-ucode.img"
+        echo "initrd    /initramfs-linux-fallback.img"
+    } >> /mnt/boot/loader/entries/arch-fb.conf
     #---------------------------------------------------------------------------
     if [[ "$fs_type" = "1" ]]; then
         arch-chroot /mnt /bin/bash -c "echo 'options    rw root=\"LABEL=ROOT\" quiet splash loglevel=3 nowatchdog rootfstype=btrfs rootflags=subvol=@' >> /boot/loader/entries/arch.conf"
