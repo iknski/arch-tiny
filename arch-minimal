@@ -545,18 +545,18 @@ arch-chroot /mnt /bin/bash -c "sed -i s/'#ru_RU.UTF-8'/'ru_RU.UTF-8'/g /etc/loca
 arch-chroot /mnt /bin/bash -c "locale-gen"
 arch-chroot /mnt /bin/bash -c "echo 'LANG=ru_RU.UTF-8' > /etc/locale.conf"
 {
-    arch-chroot /mnt /bin/bash -c "echo 'KEYMAP=ru'"
-    arch-chroot /mnt /bin/bash -c "echo 'FONT=cyr-sun16'"
-} >> /etc/vconsole.conf
+    echo "KEYMAP=ru"
+    echo "FONT=cyr-sun16"
+} >> /mnt/etc/vconsole.conf
 {
-    arch-chroot /mnt /bin/bash -c "echo 'Section \"InputClass\"'"
-    arch-chroot /mnt /bin/bash -c "echo '   Identifier \"system-keyboard\"'"
-    arch-chroot /mnt /bin/bash -c "echo '   MatchIsKeyboard \"on\"'"
-    arch-chroot /mnt /bin/bash -c "echo '   Option \"XkbLayout\" \"us,ru\"'"
-    arch-chroot /mnt /bin/bash -c "echo '   Option \"XkbModel\" \"pc105\"'"
-    arch-chroot /mnt /bin/bash -c "echo '   Option \"XkbOptions\" \"grp:ctrl_shift_toggle\"'"
-    arch-chroot /mnt /bin/bash -c "echo 'EndSection'"
-} >> /etc/X11/xorg.conf.d/00-keyboard.conf
+    echo "Section \"InputClass\""
+    echo "    Identifier \"system-keyboard\""
+    echo "    MatchIsKeyboard \"on\""
+    echo "    Option \"XkbLayout\" \"us,ru\""
+    echo "    Option \"XkbModel\" \"pc105\""
+    echo "    Option \"XkbOptions\" \"grp:ctrl_shift_toggle\""
+    echo "EndSection"
+} >> /mnt/etc/X11/xorg.conf.d/00-keyboard.conf
 #-------------------------------------------------------------------------------
 echo -en "--------------------------------------------------\n"
 read -r -sn1 -p "Locales generated, press any key to continue
@@ -579,10 +579,10 @@ read -r -sn1 -p "Hostname applied, press any key to continue
 "; echo
 #-------------------------------------------------------------------------------
 {
-    arch-chroot /mnt /bin/bash -c "echo '127.0.0.1	localhost'"
-    arch-chroot /mnt /bin/bash -c "echo '::1		localhost'"
-    arch-chroot /mnt /bin/bash -c "echo '127.0.1.1	$hostnm.localdomain	$hostnm'"
-} >> /etc/hosts
+    echo "127.0.0.1	localhost"
+    echo "::1		localhost"
+    echo "127.0.1.1	$hostnm.localdomain	$hostnm"
+} >> /mnt/etc/hosts
 echo -en "--------------------------------------------------
 "
 arch-chroot /mnt /bin/bash -c "cat /etc/hosts"
@@ -622,13 +622,13 @@ success=("Yes" "yes" "Yep" "yep" "Y" "y")
 if [[ "${success[*]}" =~ "${cp_net_settings}" ]]; then
     pacstrap -K /mnt iwd --noconfirm
     {
-        arch-chroot /mnt /bin/bash -c "echo '[General]'"
-        arch-chroot /mnt /bin/bash -c "echo 'EnableNetworkConfiguration=true'"
-        arch-chroot /mnt /bin/bash -c "echo ''"
-        arch-chroot /mnt /bin/bash -c "echo '[Network]'"
-        arch-chroot /mnt /bin/bash -c "echo 'EnableIPv6=true'"
-        arch-chroot /mnt /bin/bash -c "echo 'RoutePriorityOffset=600'"
-    } >> /etc/iwd/main.conf
+        echo "[General]"
+        echo "EnableNetworkConfiguration=true"
+        echo ""
+        echo "[Network]"
+        echo "EnableIPv6=true"
+        echo "RoutePriorityOffset=600"
+    } >> /mnt/etc/iwd/main.conf
     arch-chroot /mnt /bin/bash -c "systemctl enable systemd-networkd.service"
     arch-chroot /mnt /bin/bash -c "systemctl enable systemd-resolved.service"
     arch-chroot /mnt /bin/bash -c "systemctl enable iwd.service"
@@ -711,20 +711,6 @@ else
         arch-chroot /mnt /bin/bash -c "echo 'options    rw root=\"LABEL=ROOT\" quiet splash loglevel=3 nowatchdog rootfstype=ext4' >> /boot/loader/entries/arch.conf"
         arch-chroot /mnt /bin/bash -c "echo 'options    rw root=\"LABEL=ROOT\" quiet splash loglevel=3 nowatchdog rootfstype=ext4' >> /boot/loader/entries/arch-fb.conf"
     fi
-    # echo -en "Check your bootloader ...\n"
-    # echo -en "--------------------------------------------------\n"
-    # arch-chroot /mnt /bin/bash -c "cat /efi/loader/loader.conf"
-    # echo -en "--------------------------------------------------\n"
-    # read -r -sn1 -p "to next, press any key ..."; echo
-    # echo -en "--------------------------------------------------\n"
-    # arch-chroot /mnt /bin/bash -c "cat /boot/loader/entries/arch.conf"
-    # echo -en "--------------------------------------------------\n"
-    # read -r -sn1 -p "to next, press any key ..."; echo
-    # echo -en "--------------------------------------------------\n"
-    # arch-chroot /mnt /bin/bash -c "cat /boot/loader/entries/arch-fb.conf"
-    # echo -en "--------------------------------------------------\n"
-    # read -r -sn1 -p "to next, press any key ..."; echo
-    # echo -en "--------------------------------------------------\n"
     read -r -sn1 -p "SYSTEMD-BOOT installed and configured
 -------------------------------------------------------------------------------
 All done! Arch Linux installed and ready to use!
