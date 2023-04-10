@@ -6,7 +6,7 @@
 # License   : The MIT License (https://opensource.org/license/mit/)
 # Version   : v 2.0
 # --------------------------------------------------
-# 08.04.2023
+# 10.04.2023
 
 clear
 
@@ -381,6 +381,7 @@ clear
 driver_install="pacstrap -K /mnt dkms linux-headers $cpu-ucode --noconfirm"
 boot_tools="pacstrap -K /mnt efibootmgr efitools memtest86+-efi os-prober --noconfirm"
 pkgs_install="pacstrap -K /mnt bash-completion pacman-contrib pkgfile --noconfirm"
+cmd_install="pacstrap -K /mnt bat broot dialog duf exa glances fzf gptfdisk htop neofetch ranger wget whois tldr xsel --noconfirm"
 #-------------------------------------------------------------------------------
 echo -en "--------------------------------------------------\n"
 echo -en "One monent please, the setup is in progress...\n"
@@ -440,6 +441,7 @@ if [[ "$tool_type" = "1" ]]; then
     echo -en "Before installing, select the tool to create initramfs that you indicated earlier!!!\n"
     echo -en "--------------------------------------------------\n"
     pacstrap -Ki /mnt base base-devel linux linux-firmware reflector rsync git openssh micro
+    ${driver_install}
     echo -en "--------------------------------------------------\n"
     read -r -sn1 -p "The base Arch Linux packages have been installed...
 press any key to apply system settings
@@ -450,12 +452,6 @@ else
     echo -en "Starting Arch Linux installation\n"
     echo -en "Before installing, select the tool to create initramfs that you indicated earlier!!!\n"
     echo -en "--------------------------------------------------\n"
-    #---------------------------------------------------------------------------
-    ls -la /mnt/
-    echo -en "--------------------------------------------------\n"
-    read -r -sn1 -p "press any key to continue ...
---------------------------------------------------
-"; echo
     #---------------------------------------------------------------------------
     mkdir -p /mnt/usr/local/bin
     mkdir -p /mnt/etc/pacman.d/hooks
@@ -482,12 +478,6 @@ else
         echo "done"
     } >> /mnt/usr/local/bin/dracut-install.sh
     #---------------------------------------------------------------------------
-    cat /mnt/usr/local/bin/dracut-install.sh
-    echo -en "--------------------------------------------------\n"
-    read -r -sn1 -p "press any key to continue ...
---------------------------------------------------
-"; echo
-    #---------------------------------------------------------------------------
     {
         echo "#!/usr/bin/env bash"
         echo ""
@@ -498,12 +488,6 @@ else
         echo "    fi"
         echo "done"
     }  >> /mnt/usr/local/bin/dracut-remove.sh
-    #---------------------------------------------------------------------------
-    cat /mnt/usr/local/bin/dracut-remove.sh
-    echo -en "--------------------------------------------------\n"
-    read -r -sn1 -p "press any key to continue ...
---------------------------------------------------
-"; echo
     #---------------------------------------------------------------------------
     {
         echo "[Trigger]"
@@ -520,12 +504,6 @@ else
         echo "NeedsTargets"
     } >> /mnt/etc/pacman.d/hooks/90-dracut-install.hook
     #---------------------------------------------------------------------------
-    cat /mnt/etc/pacman.d/hooks/90-dracut-install.hook
-    echo -en "--------------------------------------------------\n"
-    read -r -sn1 -p "press any key to continue ...
---------------------------------------------------
-"; echo
-    #---------------------------------------------------------------------------
     {
         echo "[Trigger]"
         echo "Type = Path"
@@ -539,18 +517,13 @@ else
         echo "NeedsTargets"
     } >> /mnt/etc/pacman.d/hooks/60-dracut-remove.hook
     #---------------------------------------------------------------------------
-    cat /mnt/etc/pacman.d/hooks/60-dracut-remove.hook
-    echo -en "--------------------------------------------------\n"
-    read -r -sn1 -p "press any key to continue ...
---------------------------------------------------
-"; echo
-    #---------------------------------------------------------------------------
     chmod +x /mnt/usr/local/bin/dracut-install.sh
     chmod +x /mnt/usr/local/bin/dracut-remove.sh
     chmod +x /mnt/etc/pacman.d/hooks/90-dracut-install.hook
     chmod +x /mnt/etc/pacman.d/hooks/60-dracut-remove.hook
     #---------------------------------------------------------------------------
     pacstrap -Ki /mnt base base-devel reflector rsync git openssh micro
+    ${driver_install}
     arch-chroot /mnt /bin/bash -c "pacman -S linux linux-firmware"
     echo -en "--------------------------------------------------\n"
     read -r -sn1 -p "The base Arch Linux packages have been installed...
@@ -571,15 +544,19 @@ arch-chroot /mnt /bin/bash -c "sed -i s/'#en_US.UTF-8'/'en_US.UTF-8'/g /etc/loca
 arch-chroot /mnt /bin/bash -c "sed -i s/'#ru_RU.UTF-8'/'ru_RU.UTF-8'/g /etc/locale.gen"
 arch-chroot /mnt /bin/bash -c "locale-gen"
 arch-chroot /mnt /bin/bash -c "echo 'LANG=ru_RU.UTF-8' > /etc/locale.conf"
-arch-chroot /mnt /bin/bash -c "echo 'KEYMAP=ru' > /etc/vconsole.conf"
-arch-chroot /mnt /bin/bash -c "echo 'FONT=cyr-sun16' >> /etc/vconsole.conf"
-arch-chroot /mnt /bin/bash -c "echo 'Section \"InputClass\"' > /etc/X11/xorg.conf.d/00-keyboard.conf"
-arch-chroot /mnt /bin/bash -c "echo '   Identifier \"system-keyboard\"' >> /etc/X11/xorg.conf.d/00-keyboard.conf"
-arch-chroot /mnt /bin/bash -c "echo '   MatchIsKeyboard \"on\"' >> /etc/X11/xorg.conf.d/00-keyboard.conf"
-arch-chroot /mnt /bin/bash -c "echo '   Option \"XkbLayout\" \"us,ru\"' >> /etc/X11/xorg.conf.d/00-keyboard.conf"
-arch-chroot /mnt /bin/bash -c "echo '   Option \"XkbModel\" \"pc105\"' >> /etc/X11/xorg.conf.d/00-keyboard.conf"
-arch-chroot /mnt /bin/bash -c "echo '   Option \"XkbOptions\" \"grp:ctrl_shift_toggle\"' >> /etc/X11/xorg.conf.d/00-keyboard.conf"
-arch-chroot /mnt /bin/bash -c "echo 'EndSection' >> /etc/X11/xorg.conf.d/00-keyboard.conf"
+{
+    arch-chroot /mnt /bin/bash -c "echo 'KEYMAP=ru'"
+    arch-chroot /mnt /bin/bash -c "echo 'FONT=cyr-sun16'"
+} >> /etc/vconsole.conf
+{
+    arch-chroot /mnt /bin/bash -c "echo 'Section \"InputClass\"'"
+    arch-chroot /mnt /bin/bash -c "echo '   Identifier \"system-keyboard\"'"
+    arch-chroot /mnt /bin/bash -c "echo '   MatchIsKeyboard \"on\"'"
+    arch-chroot /mnt /bin/bash -c "echo '   Option \"XkbLayout\" \"us,ru\"'"
+    arch-chroot /mnt /bin/bash -c "echo '   Option \"XkbModel\" \"pc105\"'"
+    arch-chroot /mnt /bin/bash -c "echo '   Option \"XkbOptions\" \"grp:ctrl_shift_toggle\"'"
+    arch-chroot /mnt /bin/bash -c "echo 'EndSection'"
+} >> /etc/X11/xorg.conf.d/00-keyboard.conf
 #-------------------------------------------------------------------------------
 echo -en "--------------------------------------------------\n"
 read -r -sn1 -p "Locales generated, press any key to continue
@@ -601,9 +578,11 @@ read -r -sn1 -p "Hostname applied, press any key to continue
 --------------------------------------------------
 "; echo
 #-------------------------------------------------------------------------------
-arch-chroot /mnt /bin/bash -c "echo '127.0.0.1	localhost' > /etc/hosts"
-arch-chroot /mnt /bin/bash -c "echo '::1		localhost' >> /etc/hosts"
-arch-chroot /mnt /bin/bash -c "echo '127.0.1.1	$hostnm.localdomain	$hostnm' >> /etc/hosts"
+{
+    arch-chroot /mnt /bin/bash -c "echo '127.0.0.1	localhost'"
+    arch-chroot /mnt /bin/bash -c "echo '::1		localhost'"
+    arch-chroot /mnt /bin/bash -c "echo '127.0.1.1	$hostnm.localdomain	$hostnm'"
+} >> /etc/hosts
 echo -en "--------------------------------------------------
 "
 arch-chroot /mnt /bin/bash -c "cat /etc/hosts"
@@ -614,13 +593,15 @@ read -r -sn1 -p "Hosts settings applied, press any key to install bootloader, dr
 #-------------------------------------------------------------------------------
 if [[ "$fs_type" = "1" ]]; then
     pacstrap -K /mnt btrfs-progs --noconfirm
-    arch-chroot /mnt /bin/bash -c "sed -i s/'MODULES=()'/'MODULES=(crc32c libcrc32c zlib_deflate btrfs)'/g /etc/mkinitcpio.conf"
+    if [[ "$tool_type" = "1" ]]; then
+        arch-chroot /mnt /bin/bash -c "sed -i s/'MODULES=()'/'MODULES=(crc32c libcrc32c zlib_deflate btrfs)'/g /etc/mkinitcpio.conf"
+    fi
 else
     pacstrap -K /mnt e2fsprogs --noconfirm
 fi
 #-------------------------------------------------------------------------------
-${driver_install}
 ${pkgs_install}
+${cmd_install}
 #-------------------------------------------------------------------------------
 echo "root:$rootpsw" | arch-chroot /mnt chpasswd
 echo -en "--------------------------------------------------\n"
@@ -640,12 +621,14 @@ read -r -sn1 -p "$usernm created and configured, press any key to enabling and s
 success=("Yes" "yes" "Yep" "yep" "Y" "y")
 if [[ "${success[*]}" =~ "${cp_net_settings}" ]]; then
     pacstrap -K /mnt iwd --noconfirm
-    arch-chroot /mnt /bin/bash -c "echo '[General]' > /etc/iwd/main.conf"
-    arch-chroot /mnt /bin/bash -c "echo 'EnableNetworkConfiguration=true' >> /etc/iwd/main.conf"
-    arch-chroot /mnt /bin/bash -c "echo '' > /etc/iwd/main.conf"
-    arch-chroot /mnt /bin/bash -c "echo '[Network]' >> /etc/iwd/main.conf"
-    arch-chroot /mnt /bin/bash -c "echo 'EnableIPv6=true' >> /etc/iwd/main.conf"
-    arch-chroot /mnt /bin/bash -c "echo 'RoutePriorityOffset=600' >> /etc/iwd/main.conf"
+    {
+        arch-chroot /mnt /bin/bash -c "echo '[General]'"
+        arch-chroot /mnt /bin/bash -c "echo 'EnableNetworkConfiguration=true'"
+        arch-chroot /mnt /bin/bash -c "echo ''"
+        arch-chroot /mnt /bin/bash -c "echo '[Network]'"
+        arch-chroot /mnt /bin/bash -c "echo 'EnableIPv6=true'"
+        arch-chroot /mnt /bin/bash -c "echo 'RoutePriorityOffset=600'"
+    } >> /etc/iwd/main.conf
     arch-chroot /mnt /bin/bash -c "systemctl enable systemd-networkd.service"
     arch-chroot /mnt /bin/bash -c "systemctl enable systemd-resolved.service"
     arch-chroot /mnt /bin/bash -c "systemctl enable iwd.service"
@@ -675,7 +658,12 @@ echo -en "--------------------------------------------------\n"
 read -r -sn1 -p "Pacman configured, press any key to generate ramdisk environment..."; echo
 echo -en "\n"
 #-------------------------------------------------------------------------------
-arch-chroot /mnt /bin/bash -c "mkinitcpio -p linux"
+if [[ "$tool_type" = "1" ]]; then
+    arch-chroot /mnt /bin/bash -c "mkinitcpio -p linux"
+else
+    arch-chroot /mnt /bin/bash -c "dracut --force --hostonly --no-hostonly-cmdline /boot/initramfs-linux.img"
+    arch-chroot /mnt /bin/bash -c "dracut --force /boot/initramfs-linux-fallback.img"
+fi
 #-------------------------------------------------------------------------------
 echo -en "--------------------------------------------------\n"
 read -r -sn1 -p "Initial ramdisk environment created, press any key to install bootloader
@@ -695,18 +683,27 @@ Please << umount -a >> all devices and << reboot >> in to the new system!!!
 "; echo
 else
     arch-chroot /mnt /bin/bash -c "bootctl --esp-path=/efi --boot-path=/boot install --efi-boot-option-description=\"Linux Boot Manager\""
-    arch-chroot /mnt /bin/bash -c "echo 'timeout menu-force' > /efi/loader/loader.conf"
-    arch-chroot /mnt /bin/bash -c "echo 'console-mode auto' >> /efi/loader/loader.conf"
-    arch-chroot /mnt /bin/bash -c "echo 'editor no' >> /efi/loader/loader.conf"
-    arch-chroot /mnt /bin/bash -c "echo 'default arch.conf' >> /efi/loader/loader.conf"
-    arch-chroot /mnt /bin/bash -c "echo 'title    Arch Linux' > /boot/loader/entries/arch.conf"
-    arch-chroot /mnt /bin/bash -c "echo 'linux    /vmlinuz-linux' >> /boot/loader/entries/arch.conf"
-    arch-chroot /mnt /bin/bash -c "echo 'initrd    /$cpu-ucode.img' >> /boot/loader/entries/arch.conf"
-    arch-chroot /mnt /bin/bash -c "echo 'initrd    /initramfs-linux.img' >> /boot/loader/entries/arch.conf"
-    arch-chroot /mnt /bin/bash -c "echo 'title    Arch Linux fallback' > /boot/loader/entries/arch-fb.conf"
-    arch-chroot /mnt /bin/bash -c "echo 'linux    /vmlinuz-linux' >> /boot/loader/entries/arch-fb.conf"
-    arch-chroot /mnt /bin/bash -c "echo 'initrd    /$cpu-ucode.img' >> /boot/loader/entries/arch-fb.conf"
-    arch-chroot /mnt /bin/bash -c "echo 'initrd    /initramfs-linux-fallback.img' >> /boot/loader/entries/arch-fb.conf"
+    {
+        arch-chroot /mnt /bin/bash -c "echo 'timeout menu-force'"
+        arch-chroot /mnt /bin/bash -c "echo 'console-mode auto'"
+        arch-chroot /mnt /bin/bash -c "echo 'editor no'"
+        arch-chroot /mnt /bin/bash -c "echo 'default arch.conf'"
+    } >> /efi/loader/loader.conf
+    #---------------------------------------------------------------------------
+    {
+        arch-chroot /mnt /bin/bash -c "echo 'title    Arch Linux'"
+        arch-chroot /mnt /bin/bash -c "echo 'linux    /vmlinuz-linux'"
+        arch-chroot /mnt /bin/bash -c "echo 'initrd    /$cpu-ucode.img'"
+        arch-chroot /mnt /bin/bash -c "echo 'initrd    /initramfs-linux.img'"
+    } >> /boot/loader/entries/arch.conf
+    #---------------------------------------------------------------------------
+    {
+        arch-chroot /mnt /bin/bash -c "echo 'title    Arch Linux fallback'"
+        arch-chroot /mnt /bin/bash -c "echo 'linux    /vmlinuz-linux'"
+        arch-chroot /mnt /bin/bash -c "echo 'initrd    /$cpu-ucode.img'"
+        arch-chroot /mnt /bin/bash -c "echo 'initrd    /initramfs-linux-fallback.img'"
+    } >> /boot/loader/entries/arch-fb.conf
+    #---------------------------------------------------------------------------
     if [[ "$fs_type" = "1" ]]; then
         arch-chroot /mnt /bin/bash -c "echo 'options    rw root=\"LABEL=ROOT\" quiet splash loglevel=3 nowatchdog rootfstype=btrfs rootflags=subvol=@' >> /boot/loader/entries/arch.conf"
         arch-chroot /mnt /bin/bash -c "echo 'options    rw root=\"LABEL=ROOT\" quiet splash loglevel=3 nowatchdog rootfstype=btrfs rootflags=subvol=@' >> /boot/loader/entries/arch-fb.conf"
@@ -714,20 +711,20 @@ else
         arch-chroot /mnt /bin/bash -c "echo 'options    rw root=\"LABEL=ROOT\" quiet splash loglevel=3 nowatchdog rootfstype=ext4' >> /boot/loader/entries/arch.conf"
         arch-chroot /mnt /bin/bash -c "echo 'options    rw root=\"LABEL=ROOT\" quiet splash loglevel=3 nowatchdog rootfstype=ext4' >> /boot/loader/entries/arch-fb.conf"
     fi
-    echo -en "Check your bootloader ...\n"
-    echo -en "--------------------------------------------------\n"
-    arch-chroot /mnt /bin/bash -c "cat /efi/loader/loader.conf"
-    echo -en "--------------------------------------------------\n"
-    read -r -sn1 -p "to next, press any key ..."; echo
-    echo -en "--------------------------------------------------\n"
-    arch-chroot /mnt /bin/bash -c "cat /boot/loader/entries/arch.conf"
-    echo -en "--------------------------------------------------\n"
-    read -r -sn1 -p "to next, press any key ..."; echo
-    echo -en "--------------------------------------------------\n"
-    arch-chroot /mnt /bin/bash -c "cat /boot/loader/entries/arch-fb.conf"
-    echo -en "--------------------------------------------------\n"
-    read -r -sn1 -p "to next, press any key ..."; echo
-    echo -en "--------------------------------------------------\n"
+    # echo -en "Check your bootloader ...\n"
+    # echo -en "--------------------------------------------------\n"
+    # arch-chroot /mnt /bin/bash -c "cat /efi/loader/loader.conf"
+    # echo -en "--------------------------------------------------\n"
+    # read -r -sn1 -p "to next, press any key ..."; echo
+    # echo -en "--------------------------------------------------\n"
+    # arch-chroot /mnt /bin/bash -c "cat /boot/loader/entries/arch.conf"
+    # echo -en "--------------------------------------------------\n"
+    # read -r -sn1 -p "to next, press any key ..."; echo
+    # echo -en "--------------------------------------------------\n"
+    # arch-chroot /mnt /bin/bash -c "cat /boot/loader/entries/arch-fb.conf"
+    # echo -en "--------------------------------------------------\n"
+    # read -r -sn1 -p "to next, press any key ..."; echo
+    # echo -en "--------------------------------------------------\n"
     read -r -sn1 -p "SYSTEMD-BOOT installed and configured
 -------------------------------------------------------------------------------
 All done! Arch Linux installed and ready to use!
