@@ -402,7 +402,7 @@ title   Arch Linux
 linux   /<vmlinuz-linux>
 initrd  /amd-ucode.img
 initrd  /<initramfs-linux.img>
-options root="LABEL=ROOT" rw rootflags=subvol=@ nowatchdog loglevel=6 rootfstype=btrfs nvidia-drm.modeset=1
+options root="LABEL=ROOT" rw rootflags=subvol=@ nowatchdog loglevel=6 rootfstype=btrfs nvidia_drm.modeset=1
 ```
 
 <span style="color:Cyan">Так же можно в `options root=` прописать <span style="color:Red">UUID</span> корневого раздела ( `root` ). Команда ниже запишет его в конфиг:</span>
@@ -414,7 +414,7 @@ blkid /dev/sda2 >> arch.conf
 <span style="color:Cyan">Далее нужно отредактировать конфигурационный файл приведя его к виду:</span>
 
 ```
-options root="UUID=uuid of the root partition" rw rootflags=subvol=@ nowatchdog loglevel=6 rootfstype=btrfs nvidia-drm.modeset=1
+options root="UUID=uuid of the root partition" rw rootflags=subvol=@ nowatchdog loglevel=6 rootfstype=btrfs nvidia_drm.modeset=1
 ```
 
 <span style="color:Cyan">Теперь нам нужно создать конфигурационный файл для `fallback`:</span>
@@ -431,7 +431,7 @@ title   Arch Linux Fallback
 linux   /<vmlinuz-linux>
 initrd  /amd-ucode.img
 initrd  /<initramfs-linux-fallback.img>
-options root="LABEL=ROOT" rw rootflags=subvol=@ nowatchdog loglevel=6 rootfstype=btrfs nvidia-drm.modeset=1
+options root="LABEL=ROOT" rw rootflags=subvol=@ nowatchdog loglevel=6 rootfstype=btrfs nvidia_drm.modeset=1
 ```
 
 <span style="color:Cyan">Если хотим сделать `dual-boot` с `Windows` (<span style="color:Tomato">выбор между двух операционных систем при загрузке</span>):</span>
