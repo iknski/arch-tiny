@@ -554,7 +554,8 @@ arch-chroot /mnt /bin/bash -c "echo 'LANG=ru_RU.UTF-8' > /etc/locale.conf"
     echo "    MatchIsKeyboard \"on\""
     echo "    Option \"XkbLayout\" \"us,ru\""
     echo "    Option \"XkbModel\" \"pc105\""
-    echo "    Option \"XkbOptions\" \"grp:ctrl_shift_toggle\""
+    echo "    Option \"XkbOptions\" \"grp:ctrl_shift_toggle,terminate:ctrl_alt_bksp
+\""
     echo "EndSection"
 } >> /mnt/etc/X11/xorg.conf.d/00-keyboard.conf
 #-------------------------------------------------------------------------------
@@ -705,11 +706,11 @@ else
     } >> /mnt/boot/loader/entries/arch-fb.conf
     #---------------------------------------------------------------------------
     if [[ "$fs_type" = "1" ]]; then
-        arch-chroot /mnt /bin/bash -c "echo 'options    rw root=\"LABEL=ROOT\" quiet splash loglevel=3 nowatchdog rootfstype=btrfs rootflags=subvol=@' >> /boot/loader/entries/arch.conf"
-        arch-chroot /mnt /bin/bash -c "echo 'options    rw root=\"LABEL=ROOT\" quiet splash loglevel=3 nowatchdog rootfstype=btrfs rootflags=subvol=@' >> /boot/loader/entries/arch-fb.conf"
+        arch-chroot /mnt /bin/bash -c "echo 'options    rw root=\"LABEL=ROOT\" quiet splash loglevel=3 nowatchdog raid=noautodetect rootfstype=btrfs rootflags=subvol=@' >> /boot/loader/entries/arch.conf"
+        arch-chroot /mnt /bin/bash -c "echo 'options    rw root=\"LABEL=ROOT\" quiet splash loglevel=3 nowatchdog raid=noautodetect rootfstype=btrfs rootflags=subvol=@' >> /boot/loader/entries/arch-fb.conf"
     else
-        arch-chroot /mnt /bin/bash -c "echo 'options    rw root=\"LABEL=ROOT\" quiet splash loglevel=3 nowatchdog rootfstype=ext4' >> /boot/loader/entries/arch.conf"
-        arch-chroot /mnt /bin/bash -c "echo 'options    rw root=\"LABEL=ROOT\" quiet splash loglevel=3 nowatchdog rootfstype=ext4' >> /boot/loader/entries/arch-fb.conf"
+        arch-chroot /mnt /bin/bash -c "echo 'options    rw root=\"LABEL=ROOT\" quiet splash loglevel=3 nowatchdog raid=noautodetect rootfstype=ext4' >> /boot/loader/entries/arch.conf"
+        arch-chroot /mnt /bin/bash -c "echo 'options    rw root=\"LABEL=ROOT\" quiet splash loglevel=3 nowatchdog raid=noautodetect rootfstype=ext4' >> /boot/loader/entries/arch-fb.conf"
     fi
     read -r -sn1 -p "SYSTEMD-BOOT installed and configured
 -------------------------------------------------------------------------------
