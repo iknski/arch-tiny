@@ -82,7 +82,7 @@ do
 	    Yes | yes | Yep | yep | Y | y) echo "Preparing the disk ..."
 	    sleep 2
 	    wipefs -af /dev/$archdisk
-		cfdisk /dev/$archdisk
+		gdisk /dev/$archdisk
 	    break;;
 	    No | no | Nope | nope | N | n) echo "The script is closed ..."
 	    sleep 2
@@ -135,13 +135,9 @@ echo -en "--------------------------------------------------\n"
 read -r -p "| create directory -> /. >>> " adddir
 #-------------------------------------------------------------------------------
 mkfs.vfat -F32 /dev/$esp
-wait
-fatlabel /dev/$esp ESP
-wait
+# fatlabel /dev/$esp ESP
 mkfs.vfat -F32 /dev/$boot
-wait
-fatlabel /dev/$boot BOOT
-wait
+# fatlabel /dev/$boot BOOT
 if [ -n "$swap" ]; then
     mkswap /dev/$swap
     swapon /dev/$swap
@@ -156,9 +152,7 @@ do
     case $fs_type in
         1) echo "File system selected - BTRFS"
         mkfs.btrfs -f /dev/$root
-        wait
         btrfs filesystem label /dev/$root ROOT
-        wait
 		read -r -p "select the \"zstd\" compression level ( from 1 to 15 ) >>> " clvl
 		mount  /dev/$root /mnt
 		btrfs subvolume create /mnt/@
@@ -180,9 +174,7 @@ do
         break;;
         2) echo "File system selected - EXT4"
         mkfs.ext4 -F /dev/$root
-        wait
         e2label /dev/$root ROOT
-        wait
         mount  /dev/$root /mnt
         mkdir -p /mnt/{home,$adddir}
         break;;
