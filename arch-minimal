@@ -136,8 +136,8 @@ read -r -p "| create directory -> /. >>> " adddir
 #-------------------------------------------------------------------------------
 mkfs.vfat -F32 /dev/$esp
 fatlabel /dev/$esp ESP
-mkfs.vfat -F32 /dev/$boot
-fatlabel /dev/$boot BOOT
+mkfs.ext4 -F -O ^has_journal /dev/$boot
+e2label /dev/$boot BOOT
 if [ -n "$swap" ]; then
     mkswap /dev/$swap
     swapon /dev/$swap
