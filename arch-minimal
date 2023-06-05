@@ -135,9 +135,9 @@ echo -en "--------------------------------------------------\n"
 read -r -p "| create directory -> /. >>> " adddir
 #-------------------------------------------------------------------------------
 mkfs.vfat -F32 /dev/$esp
-# fatlabel /dev/$esp ESP
+fatlabel /dev/$esp ESP
 mkfs.vfat -F32 /dev/$boot
-# fatlabel /dev/$boot BOOT
+fatlabel /dev/$boot BOOT
 if [ -n "$swap" ]; then
     mkswap /dev/$swap
     swapon /dev/$swap
