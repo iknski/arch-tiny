@@ -371,9 +371,9 @@ done
 clear
 #-------------------------------------------------------------------------------
 driver_install="pacstrap -K /mnt dkms linux-headers $cpu-ucode --noconfirm"
-boot_tools="pacstrap -K /mnt efibootmgr efitools memtest86+-efi os-prober --noconfirm"
+boot_tools="pacstrap -K /mnt efibootmgr efifs efitools efivar --noconfirm"
 pkgs_install="pacstrap -K /mnt bash-completion pacman-contrib pkgfile --noconfirm"
-cmd_install="pacstrap -K /mnt bat broot dialog duf exa glances fzf gptfdisk htop neofetch ranger wget whois tldr xsel --noconfirm"
+cmd_install="pacstrap -K /mnt bat broot duf exa glances gptfdisk fzf git htop neofetch openssh ranger wget whois tldr xsel --noconfirm"
 #-------------------------------------------------------------------------------
 echo -en "--------------------------------------------------\n"
 echo -en "One monent please, the setup is in progress...\n"
@@ -432,7 +432,7 @@ if [[ "$tool_type" = "1" ]]; then
     echo -en "Starting Arch Linux installation\n"
     echo -en "Before installing, select the tool to create initramfs that you indicated earlier!!!\n"
     echo -en "--------------------------------------------------\n"
-    pacstrap -Ki /mnt base base-devel linux linux-firmware reflector rsync git openssh micro
+    pacstrap -Ki /mnt base base-devel linux linux-firmware reflector rsync micro
     ${driver_install}
     echo -en "--------------------------------------------------\n"
     read -r -sn1 -p "The base Arch Linux packages have been installed...
@@ -644,7 +644,7 @@ read -r -sn1 -p "Services are running
 sed -i s/'#Color'/'Color'/g /mnt/etc/pacman.conf
 sed -i s/'#VerbosePkgLists'/'VerbosePkgLists'/g /mnt/etc/pacman.conf
 sed -i s/'#ParallelDownloads = 5'/'ParallelDownloads = 5'/g /mnt/etc/pacman.conf
-sed -i "/\[multilib\]/,/Include/"'s/^#//' /mnt/etc/pacman.conf
+# sed -i "/\[multilib\]/,/Include/"'s/^#//' /mnt/etc/pacman.conf
 arch-chroot /mnt /bin/bash -c "pacman -Syy"
 arch-chroot /mnt /bin/bash -c "reflector --verbose --country 'Russia,Germany,' --latest 5 --sort rate --save /etc/pacman.d/mirrorlist"
 echo -en "--------------------------------------------------\n"
@@ -665,7 +665,7 @@ echo -en "\n"
 #-------------------------------------------------------------------------------
 ${boot_tools}
 if [[ "$boot_type" = "1" ]]; then
-    pacstrap -K /mnt grub --noconfirm
+    pacstrap -K /mnt grub os-prober --noconfirm
     arch-chroot /mnt /bin/bash -c "grub-install --efi-directory=/efi --boot-directory=/boot --bootloader-id=\"Linux Boot Manager\""
     arch-chroot /mnt /bin/bash -c "grub-mkconfig -o /boot/grub/grub.cfg"
     read -r -sn1 -p "GRUB installed and configured
