@@ -135,8 +135,8 @@ echo -en "--------------------------------------------------\n"
 read -r -p "| create directory -> /. >>> " adddir
 #-------------------------------------------------------------------------------
 mkfs.vfat -F32 /dev/$esp
-fatlabel /dev/$esp ESP
 mkfs.vfat -F32 /dev/$boot
+fatlabel /dev/$esp ESP
 fatlabel /dev/$boot BOOT
 if [ -n "$swap" ]; then
     mkswap /dev/$swap
@@ -373,7 +373,7 @@ clear
 driver_install="pacstrap -K /mnt dkms linux-headers $cpu-ucode --noconfirm"
 boot_tools="pacstrap -K /mnt efibootmgr efifs efitools efivar --noconfirm"
 pkgs_install="pacstrap -K /mnt bash-completion pacman-contrib pkgfile --noconfirm"
-cmd_install="pacstrap -K /mnt bat broot duf exa glances gptfdisk fzf git htop neofetch openssh ranger wget whois tldr xsel --noconfirm"
+cmd_install="pacstrap -K /mnt bat broot duf exa glances gptfdisk fzf git htop neofetch openssh ranger wget whois --noconfirm"
 #-------------------------------------------------------------------------------
 echo -en "--------------------------------------------------\n"
 echo -en "One monent please, the setup is in progress...\n"
@@ -546,8 +546,7 @@ arch-chroot /mnt /bin/bash -c "echo 'LANG=ru_RU.UTF-8' > /etc/locale.conf"
     echo "    MatchIsKeyboard \"on\""
     echo "    Option \"XkbLayout\" \"us,ru\""
     echo "    Option \"XkbModel\" \"pc105\""
-    echo "    Option \"XkbOptions\" \"grp:ctrl_shift_toggle,terminate:ctrl_alt_bksp
-\""
+    echo "    Option \"XkbOptions\" \"grp:ctrl_shift_toggle,terminate:ctrl_alt_bksp\""
     echo "EndSection"
 } >> /mnt/etc/X11/xorg.conf.d/00-keyboard.conf
 #-------------------------------------------------------------------------------
@@ -557,7 +556,7 @@ read -r -sn1 -p "Locales generated, press any key to continue
 "; echo
 #-------------------------------------------------------------------------------
 arch-chroot /mnt /bin/bash -c "ln -sf /usr/share/zoneinfo/$area/$city /etc/localtime"
-arch-chroot /mnt /bin/bash -c "hwclock --systohc --utc"
+arch-chroot /mnt /bin/bash -c "hwclock --systohc"
 echo -en "--------------------------------------------------\n"
 read -r -sn1 -p "Time is synchronized, press any key to continue
 --------------------------------------------------
@@ -644,7 +643,7 @@ read -r -sn1 -p "Services are running
 sed -i s/'#Color'/'Color'/g /mnt/etc/pacman.conf
 sed -i s/'#VerbosePkgLists'/'VerbosePkgLists'/g /mnt/etc/pacman.conf
 sed -i s/'#ParallelDownloads = 5'/'ParallelDownloads = 5'/g /mnt/etc/pacman.conf
-# sed -i "/\[multilib\]/,/Include/"'s/^#//' /mnt/etc/pacman.conf
+sed -i "/\[multilib\]/,/Include/"'s/^#//' /mnt/etc/pacman.conf
 arch-chroot /mnt /bin/bash -c "pacman -Syy"
 arch-chroot /mnt /bin/bash -c "reflector --verbose --country 'Russia,Germany,' --latest 5 --sort rate --save /etc/pacman.d/mirrorlist"
 echo -en "--------------------------------------------------\n"
