@@ -372,7 +372,7 @@ clear
 #-------------------------------------------------------------------------------
 driver_install="pacstrap -K /mnt dkms linux-headers $cpu-ucode --noconfirm"
 boot_tools="pacstrap -K /mnt efibootmgr efifs efitools efivar --noconfirm"
-pkgs_install="pacstrap -K /mnt bash-completion pacman-contrib pkgfile --noconfirm"
+pkgs_install="pacstrap -K /mnt bash-completion archlinux-contrib pacman-contrib pkgfile --noconfirm"
 cmd_install="pacstrap -K /mnt bat broot duf exa glances gptfdisk fzf git htop neofetch openssh ranger wget whois --noconfirm"
 #-------------------------------------------------------------------------------
 echo -en "--------------------------------------------------\n"
@@ -646,6 +646,8 @@ sed -i s/'#ParallelDownloads = 5'/'ParallelDownloads = 5'/g /mnt/etc/pacman.conf
 sed -i "/\[multilib\]/,/Include/"'s/^#//' /mnt/etc/pacman.conf
 arch-chroot /mnt /bin/bash -c "pacman -Syy"
 arch-chroot /mnt /bin/bash -c "reflector --verbose --country 'Russia,Germany,' --latest 5 --sort rate --save /etc/pacman.d/mirrorlist"
+arch-chroot /mnt /bin/bash -c "sed -i s/'--country France,Germany'/'--country Russia,Germany'/g /etc/xdg/reflector/reflector.conf"
+arch-chroot /mnt /bin/bash -c "sed -i s/'--sort age'/'--sort rate'/g /etc/xdg/reflector/reflector.conf"
 echo -en "--------------------------------------------------\n"
 read -r -sn1 -p "Pacman configured, press any key to install bootloader..."; echo
 echo -en "\n"
