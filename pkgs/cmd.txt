@@ -1,0 +1,7 @@
+bat
+eza
+broot
+btop
+duf
+fastfetch
+cpufetch

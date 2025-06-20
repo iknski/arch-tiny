@@ -1,0 +1,4 @@
+efibootmgr
+efifs
+efitools
+efivar

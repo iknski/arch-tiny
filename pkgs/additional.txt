@@ -1,0 +1,14 @@
+bash-completion
+archlinux-contrib
+pacman-contrib
+sudo
+git
+wget
+openssh
+parted
+nvme-cli
+reflector
+micro
+terminus-font
+ttf-iosevka-nerd
+ttf-firacode-nerd
