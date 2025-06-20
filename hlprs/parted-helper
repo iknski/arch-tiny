@@ -1,0 +1,84 @@
+#!/usr/bin/env bash
+#
+
+# https://en.wikipedia.org/wiki/GUID_Partition_Table#Partition_type_GUIDs
+# https://www.gnu.org/software/parted/manual/html_node/set.html
+
+while true; do
+    echo -en "| Хотите ли вы создать отдельный раздел ${GREEN}/HOME?\n${NORMAL}"
+    echo -en "| Оставьте поле пустым для выбора по умолчанию: ${GREEN}Без отдельного раздела HOME\n${NORMAL}"
+    echo -en "----------------------------------------------------------------------\n"
+    echo -en "| 1 - Без отдельного раздела /HOME\n| 2 - С отдельным разделом /HOME\n"
+    read -r -p "| Ваш выбор (1/2): >>> " home_type
+    case ${home_type} in
+        1)
+            echo "| Ваш выбор - Без отдельного раздела HOME"
+            echo -en "| Очистка диска ${archdisk}...\n"
+            wipefs -af /dev/${archdisk} &>/dev/null
+            sleep 1
+            #-------
+            echo -en "| Создание таблицы разделов на диске ${archdisk}...\n"
+            parted -s /dev/${archdisk} mklabel gpt
+            sleep 1
+            #-------
+            echo -en "| Создание раздела ESP (EFI System partition (C12A7328-F81F-11D2-BA4B-00A0C93EC93B)) на диске ${archdisk}...\n"
+            parted -s --align optimal /dev/${archdisk} mkpart esp fat32 1MiB 1025MiB
+            parted -s /dev/${archdisk} set 1 esp on
+            sleep 1
+            #-------
+            echo -en "| Создание системного раздела (Linux Root partition (4F68BCE3-E8CD-4DB1-96E7-FBCAF984B709)) на диске ${archdisk}...\n"
+            parted -s --align optimal /dev/${archdisk} mkpart root ext4 1025MiB 100%
+            parted -s /dev/${archdisk} type 2 4F68BCE3-E8CD-4DB1-96E7-FBCAF984B709
+            #-------
+            partition1=${archdisk}p1
+            partition2=${archdisk}p2
+            #-------
+            echo -en "----------------------------------------------------------------------\n"
+            echo -en "| Создание файловой системы EXT4 на диске ${archdisk}...\n"
+            mkfs.ext4 -qF -L ROOT /dev/${partition2} &>/dev/null
+            mount /dev/${partition2} /mnt
+            mkdir -p /mnt/boot
+            mkfs.vfat -F32 -n ESP /dev/${partition1} &>/dev/null
+            mount /dev/${partition1} /mnt/boot
+            #-------
+            break;;
+        2)
+            echo "| Ваш выбор - С отдельным разделом HOME"
+            echo -en "| Очистка диска ${archdisk}...\n"
+            wipefs -af /dev/${archdisk} &>/dev/null
+            sleep 1
+            #-------
+            echo -en "| Создание таблицы разделов на диске ${archdisk}...\n"
+            parted -s /dev/${archdisk} mklabel gpt
+            sleep 1
+            #-------
+            echo -en "| Создание раздела ESP (EFI System partition (C12A7328-F81F-11D2-BA4B-00A0C93EC93B)) на диске ${archdisk}...\n"
+            parted -s --align optimal /dev/${archdisk} mkpart esp fat32 1MiB 1025MiB
+            parted -s /dev/${archdisk} set 1 esp on
+            sleep 1
+            #-------
+            echo -en "| Создание системного раздела (Linux Root partition (4F68BCE3-E8CD-4DB1-96E7-FBCAF984B709)) на диске ${archdisk}...\n"
+            parted -s --align optimal /dev/${archdisk} mkpart root ext4 1025MiB 33793MiB
+            parted -s /dev/${archdisk} type 2 4F68BCE3-E8CD-4DB1-96E7-FBCAF984B709
+            #-------
+            echo -en "| Создание домашнего раздела (Linux Home partition (933AC7E1-2EB4-4F13-B844-0E14E2AEF915)) на диске ${archdisk}...\n"
+            parted -s --align optimal /dev/${archdisk} mkpart home ext4 33793MiB 100%
+            parted -s /dev/${archdisk} set 3 linux-home on
+            #-------
+            partition1=${archdisk}p1
+            partition2=${archdisk}p2
+            partition3=${archdisk}p3
+            #-------
+            echo -en "----------------------------------------------------------------------\n"
+            echo -en "| Создание файловой системы EXT4 на диске ${archdisk}...\n"
+            mkfs.ext4 -qF -L ROOT /dev/${partition2} &>/dev/null
+            mkfs.ext4 -qF -L HOME /dev/${partition3} &>/dev/null
+            mount /dev/${partition2} /mnt
+            mkdir -p /mnt/{boot,home}
+            mount /dev/${partition3} /mnt/home
+            mkfs.vfat -F32 -n ESP /dev/${partition1} &>/dev/null
+            mount /dev/${partition1} /mnt/boot
+            #-------
+            break;;
+    esac
+done

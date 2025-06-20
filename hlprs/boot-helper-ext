@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+#
+
+UUID=`blkid -s UUID -o value /dev/${partition3}`  # Узнать UUID корневого диска
+			arch-chroot /mnt /bin/bash -c "bootctl --esp-path=/efi --boot-path=/boot install"
+			{
+				echo "default arch.conf"
+				echo "timeout menu-force"
+				echo "console-mode auto"
+				echo "editor no"
+			} >>/mnt/efi/loader/loader.conf
+			#-------
+			{
+				echo "title    Arch Linux"
+				echo "linux    /vmlinuz-linux"
+				echo "initrd    /${proc_ucode}.img"
+				echo "initrd    /initramfs-linux.img"
+			} >>/mnt/boot/loader/entries/arch.conf
+			#-------
+			{
+				echo "title    Arch Linux fallback"
+				echo "linux    /vmlinuz-linux"
+				echo "initrd    /${proc_ucode}.img"
+				echo "initrd    /initramfs-linux-fallback.img"
+			} >>/mnt/boot/loader/entries/arch-fb.conf
+#-------
+echo "options    root=\"UUID=${UUID}\" nvme_load=YES nvme_core.default_ps_max_latency_us=0 rw quiet splash loglevel=3 nowatchdog raid=noautodetect rootfstype=ext4 nvidia_drm.modeset=1" >> /mnt/boot/loader/entries/arch.conf
+echo "options    root=\"UUID=${UUID}\" nvme_load=YES nvme_core.default_ps_max_latency_us=0 rw quiet splash loglevel=3 nowatchdog raid=noautodetect rootfstype=ext4 nvidia_drm.modeset=1" >> /mnt/boot/loader/entries/arch-fb.conf

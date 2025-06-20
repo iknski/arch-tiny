@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+#
+
+keygen() {
+	while [[ "${#password}" -ne "${pass_len}" ]]; do
+		rand_char=$(shuf -e -r -n 1 {A..Z} {a..z} {0..9} {\! @ \# \$ % ^ \& \* \( \) _ + - = [ ] { } \| \'} | tr -d '\n')
+		password+="${rand_char}"
+	done
+}
+#-------
+echo -en "----------------------------------------------------------------------\n"
+echo -en "| ${RED}ВНИМАНИЕ!!! Обязательно запомните этот пароль!!!\n${NORMAL}"
+while true; do
+	echo -en "----------------------------------------------------------------------\n"
+	echo -en "| 1 - Сгенерировать случайный пароль\n"
+	echo -en "| 2 - Ввести свой пароль\n"
+	echo -en "----------------------------------------------------------------------\n"
+	read -r -p "| Ваш выбор (1/2): >>> " gen_choice
+	case ${gen_choice} in
+	1)
+		unset password
+		echo -en "| Генерация пароля...\n"
+		read -r -p "| Введите желаемую длинну пароля (от 8 до 16) >>> " pass_len
+		if ! [[ "${pass_len}" =~ ^[0-9]+$ ]]; then
+			echo "| Только цифры..."
+			continue
+		fi
+		keygen
+		echo -en "\n"
+		echo -en "**************************************************\n"
+		echo -en "| Ваш пароль: ${password}\n"
+		echo -en "**************************************************\n"
+		echo -en "\n"
+		read -r -p "| Генерировать снова? (Y/N) >>> " again_choise
+		case ${again_choise} in
+		Yes | YES | yes | Yep | YEP | yep | Y | y) continue;;
+		No | NO | no | Nope | NOPE | nope | N | n) break;;
+		*) echo -en "| Неверный ввод, попробуйте снова ...\n";;
+		esac;;
+	2)
+		read -r -p "| Введите ваш пароль сюда >>> " password
+		echo -en "\n"
+		echo -en "**************************************************\n"
+		echo -en "| Ваш пароль: ${password}\n"
+		echo -en "**************************************************\n"
+		echo -en "\n"
+		break;;
+	*)
+		echo -en "| Неверный ввод, попробуйте снова ...\n"
+		continue;;
+	esac
+done

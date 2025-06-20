@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+#
+
+install() {
+    cat ${1} | while read line; do
+        pacstrap -K /mnt ${line} --noconfirm --needed
+    done
+}
