@@ -1,0 +1,390 @@
+#!/usr/bin/env bash
+#
+# Automated Arch Linux Installer by iknski - mini version with
+# --------------------------------------------------------------------
+# Author    : iknski
+# License   : GNU GPLv2 (https://www.gnu.org/licenses/old-licenses/gpl-2.0.html)
+# Version   : v 2.1
+# --------------------------------------------------------------------
+# 20.06.2025
+#
+
+pacman -Sy --noconfirm archlinux-keyring
+pacman -S --noconfirm --needed pacman-contrib terminus-font
+loadkeys ru
+setfont ter-v32n
+BLINK="\033[5m"
+BLACK="\033[0;30m"
+RED="\033[0;31m"
+LRED="\033[1;31m"
+GREEN="\033[0;32m"
+LGREEN="\033[1;32m"
+BLUE="\033[0;34m"
+LBLUE="\033[1;34m"
+WHITE="\033[0;37m"
+LWHITE="\033[1;37m"
+NORMAL="\033[0m"
+#-------
+clear
+echo -en "
+ ____ ____ ____ ____ ______________ ____ ____ ____ ____ ____ ____ ____
+||A |||R |||C |||H |||    from    |||I |||N |||S |||T |||A |||L |||L ||
+||__|||__|||__|||__|||___iknski___|||__|||__|||__|||__|||__|||__|||__||
+|/__\|/__\|/__\|/__\|/____________\|/__\|/__\|/__\|/__\|/__\|/__\|/__\|
+
+----------------------------------------------------------------------
+| Внимание!!!
+|
+| ***
+| Скрипт поставляется как есть и писался для себя
+| Можете видоизменить его под свое оборудование
+|
+| ***
+| Создан исключительно для UEFI API и NVME дисков
+| Будут установлены новейшие драйверы для видеокарт NVIDIA
+| и произведены настройки в параметрах ядра и файле mkinitcpio.conf
+|
+| ***
+| Скрипт установит ${LBLUE}Arch Linux${NORMAL} в минимальной версии
+| После установки подключитесь к интернету с помощью Network Manager (nmcli)
+| Установите нужные вам пакеты и графическое окружение
+----------------------------------------------------------------------
+"
+read -r -sn1 -p "| Нажмите любую клавишу чтобы продолжить..."
+echo -en "----------------------------------------------------------------------\n"
+#-------
+timedatectl set-ntp true
+timedatectl set-timezone Europe/Moscow
+clear
+#
+echo -en "======================================================================\n"
+echo -en ">>>                           ВЫБОР ДИСКА                          <<<\n"
+echo -en "======================================================================\n"
+lsblk -o NAME,LABEL,UUID,FSTYPE,MOUNTPOINTS
+echo -en "----------------------------------------------------------------------\n"
+echo -en "| Введите имя диска на который хотите установить ${LBLUE}Arch Linux\n${NORMAL}"
+echo -en "----------------------------------------------------------------------\n"
+# получаем список блочных устройств пользователя
+blocks=()
+for item in $(ls /sys/class/block); do
+    blocks+=("${item}")
+done
+# проверка пользователя на ошибочный ввод блочного устройства
+for item in "${blocks[@]}"; do
+    read -r -p "| Установить Arch Linux на -> /dev/. >>> " archdisk
+    if [[ "${blocks[*]}" =~ "${archdisk}" ]]; then
+        echo "| Ваш выбор: ${archdisk}"
+        break
+    else
+        echo "| ${archdisk} - нет такого диска, попробуйте ввести снова ..."
+        continue
+    fi
+done
+#-------
+echo -en "----------------------------------------------------------------------\n"
+echo -en "| Выберите схему разметки дискового пространства:\n"
+echo -en "| Классическая или схема с XBOOTLDR (Linux Extended Boot Loader)\n"
+echo -en "| Оставьте поле пустым для выбора по умолчанию: ${GREEN}Классическая\n${NORMAL}"
+echo -en "----------------------------------------------------------------------\n"
+echo -en "| 1 - Классическая\n| 2 - XBOOTLDR\n"
+read -r -p "| Ваш выбор (1/2): >>> " part_type
+#-------
+while true; do
+    echo -en "----------------------------------------------------------------------\n"
+    echo -en "| ${RED}Внимание!!! Данные на устройстве /dev/${archdisk} будут УДАЛЕНЫ!!!\n${NORMAL}"
+    echo -en "| ${GREEN}Если хотите остановить выполнение скрипта, выберите - No\n${NORMAL}"
+    echo -en "| Продолжить установку системы?\n"
+    echo -en "----------------------------------------------------------------------\n"
+    read -r -p "| Yes/No (Y/N) >>> " user_answer
+    case ${user_answer} in
+    Yes | YES | yes | Yep | YEP | yep | Y | y)
+        echo -en "----------------------------------------------------------------------\n"
+        if [[ "${part_type}" = "1" ]]; then
+            source $(dirname $0)/hlprs/parted-helper
+        else
+            source $(dirname $0)/hlprs/parted-helper-ext
+        fi
+        echo -en "----------------------------------------------------------------------\n"
+        echo -en "| Хотите ли вы добавить ешё какой либо диск в систему?\n"
+        echo -en "| или оставьте это поле пустым...\n"
+        echo -en "----------------------------------------------------------------------\n"
+        read -r -p "| введите имя устройства (например sda1, nvme1n1p1) -> /dev/. >>> " anydisk
+        echo -en "----------------------------------------------------------------------\n"
+        echo -en "| Введите название директории к которой этот диск будет примонтирован (напимер storage, media, archive)\n"
+        echo -en "| или тоже оставьте это поле пустым если ничего не выбирали выше...\n"
+        echo -en "----------------------------------------------------------------------\n"
+        read -r -p "| создать директорию -> /. >>> " anydir
+        unset user_answer
+        break;;
+    No | NO | no | Nope | NOPE | nope | N | n | "")
+        echo "| Работа скрипта завершена..."
+        unset user_answer
+        sleep 1
+        clear
+        exit;;
+    *)
+        echo "| Неверный ввод, попробуйте снова..."
+        continue;;
+    esac
+done
+#-------
+if [ -n "$anydisk" ]; then
+    mkdir -p /mnt/$anydir
+    mount /dev/$anydisk /mnt/$anydir
+fi
+echo -en "----------------------------------------------------------------------\n"
+lsblk -o NAME,LABEL,UUID,FSTYPE,MOUNTPOINTS
+echo -en "----------------------------------------------------------------------\n"
+echo -en "| Диск подготовлен для установки...\n"
+read -r -sn1 -p "| Нажмите любую клавишу чтобы продолжить..."
+clear
+#-------
+echo -en "----------------------------------------------------------------------\n"
+echo -en "| Создайте имя вашего компьютера\n"
+echo -en "----------------------------------------------------------------------\n"
+while true
+do
+    read -r -p "| Ввести имя компьютера >>> " hostnm
+    # проверка корректного названия компьютера
+    if [[ "${hostnm}" =~ ^[a-z][a-z0-9_.-]{0,62}[a-z0-9]$ ]]; then
+        break
+    fi
+    read -p "| Такое имя некорректно. Уверены что хотите его оставить? (Y/N)" user_answer
+    if [[ "${user_answer}" = "y" ]]; then
+        unset user_answer
+        break
+    fi
+done
+#-------
+echo -en "----------------------------------------------------------------------\n"
+echo -en "| Создайте пароль для юзера ${RED}root\n${NORMAL}"
+source $(dirname $0)/hlprs/keygen-helper
+rootpsw="${password}"
+unset password
+clear
+#-------
+echo -en "----------------------------------------------------------------------\n"
+echo -en "| Создайте своего пользователя\n"
+echo -en "----------------------------------------------------------------------\n"
+while true
+do
+    read -r -p "| Ввести имя пользователя >>> " usernm
+    echo -en "----------------------------------------------------------------------\n"
+    # проверка корректного имени пользователя
+    # https://unix.stackexchange.com/questions/157426/what-is-the-regex-to-validate-linux-users
+    if [[ "${usernm}" =~ ^[a-z_]([a-z0-9_-]{0,31}|[a-z0-9_-]{0,30}\$)$ ]]; then
+        break
+    fi
+    echo "| Некорректное имя пользователя..."
+done
+usernm=${usernm}
+echo -en "| Создайте пароль для пользователя ${GREEN}${usernm}\n${NORMAL}"
+source $(dirname $0)/hlprs/keygen-helper
+userpsw="${password}"
+unset password
+clear
+#-------
+echo -en "======================================================================\n"
+echo -en ">>>                   Настройка часового пояса                     <<<\n"
+echo -en "======================================================================\n"
+while true; do
+    read -p "Хотите ли определить ваше местоположение автоматически? (Y/N)" user_answer
+    if [[ "${user_answer}" = "y" ]]; then
+        time_zone="$(curl --fail https://ipapi.co/timezone)"
+        echo -en "\n"
+        echo -en "**************************************************\n"
+        echo -en "| Ваше местоположение: ${GREEN}${time_zone}\n${NORMAL}"
+        echo -en "**************************************************\n"
+        echo -en "\n"
+        unset user_answer
+        sleep 1
+        break
+    else
+        echo -en "----------------------------------------------------------------------\n"
+        echo -en "| Введите ваш регион обязательно с заглавной буквы в формате (Europe/Moscow, America/Chicago...)\n"
+        echo -en "----------------------------------------------------------------------\n"
+        read -r -p "| Ввести местоположение >>> " time_zone
+        echo -en "----------------------------------------------------------------------\n"
+        unset user_answer
+        break
+    fi
+done
+clear
+#-------
+echo -en "----------------------------------------------------------------------\n"
+echo -en "| Определение вендора вашего процессора (amd или intel...)\n"
+echo -en "----------------------------------------------------------------------\n"
+proc_type=$(lscpu)
+if grep -E "GenuineIntel" <<< ${proc_type} &>/dev/null; then
+    echo -en "\n"
+    echo -en "**************************************************\n"
+    echo -en "| Ваш $(grep -E "GenuineIntel" <<< ${proc_type})\n| Будет установлен ${LBLUE}Intel microcode\n${NORMAL}"
+    echo -en "\n"
+    echo -en "**************************************************\n"
+    proc_ucode=intel-ucode
+elif grep -E "AuthenticAMD" <<< ${proc_type} &>/dev/null; then
+    echo -en "\n"
+    echo -en "**************************************************\n"
+    echo -en "| Ваш $(grep -E "AuthenticAMD" <<< ${proc_type})\n| Будет установлен ${LRED}AMD microcode\n${NORMAL}"
+    echo -en "**************************************************\n"
+    echo -en "\n"
+    proc_ucode=amd-ucode
+fi
+sleep 3
+clear
+#-------
+echo -en "----------------------------------------------------------------------\n"
+echo -en "| Небольшие подготовительные процедуры...\n"
+echo -en "----------------------------------------------------------------------\n"
+timedatectl set-ntp true
+timedatectl set-timezone ${time_zone}
+timedatectl status
+sleep 3
+#-------
+echo -en "----------------------------------------------------------------------\n"
+echo -en "| Установка ${LBLUE}Arch Linux${NORMAL} в минимальной версии началась...\n"
+echo -en "----------------------------------------------------------------------\n"
+source $(dirname $0)/hlprs/install-helper
+install $(dirname $0)/pkgs/base.txt
+pacstrap -K /mnt ${proc_ucode} --noconfirm
+install $(dirname $0)/pkgs/driver.txt
+install $(dirname $0)/pkgs/additional.txt
+echo -en "----------------------------------------------------------------------\n"
+echo -en "| ${LBLUE}Arch Linux${NORMAL} установлен...\n"
+echo -en "| Генерируем таблицу файловой системы...\n"
+echo -en "----------------------------------------------------------------------\n"
+genfstab -U /mnt >> /mnt/etc/fstab
+cat /mnt/etc/fstab
+sleep 3
+#-------
+# твик компилятора
+ncpu=$(grep -c ^processor /proc/cpuinfo)
+TOTAL_MEM=$(cat /proc/meminfo | grep -i 'memtotal' | grep -o '[[:digit:]]*')
+if [[  ${TOTAL_MEM} -gt 8000000 ]]; then
+sed -i "s/#MAKEFLAGS=\"-j2\"/MAKEFLAGS=\"-j${ncpu}\"/g" /mnt/etc/makepkg.conf
+sed -i "s/COMPRESSXZ=(xz -c -z -)/COMPRESSXZ=(xz -c -T ${ncpu} -z -)/g" /mnt/etc/makepkg.conf
+fi
+#-------
+echo -en "| Настриваем локали...\n"
+echo -en "----------------------------------------------------------------------\n"
+arch-chroot /mnt /bin/bash -c "sed -i '/^#en_US.UTF-8/s/^.//' /etc/locale.gen"
+sed -i '/^#ru_RU.UTF-8/s/^.//' /etc/locale.gen
+arch-chroot /mnt /bin/bash -c "sed -i '/^#ru_RU.UTF-8/s/^.//' /etc/locale.gen"
+arch-chroot /mnt /bin/bash -c "locale-gen"
+arch-chroot /mnt /bin/bash -c "echo 'LANG=ru_RU.UTF-8' > /etc/locale.conf"
+{
+    echo "KEYMAP=ru"
+    echo "FONT=ter-v32n"
+    echo "XKBLAYOUT=ru"
+    echo "XKBMODEL=pc105+inet"
+    echo "XKBOPTIONS=terminate:ctrl_alt_bksp,grp:ctrl_shift_toggle"
+} >> /mnt/etc/vconsole.conf
+sleep 1
+#-------
+echo -en "| Синхронизируем время...\n"
+echo -en "----------------------------------------------------------------------\n"
+arch-chroot /mnt /bin/bash -c "ln -sf /usr/share/zoneinfo/${time_zone} /etc/localtime"
+arch-chroot /mnt /bin/bash -c "hwclock --systohc"
+sleep 1
+#-------
+echo -en "| Применяем настройки хоста...\n"
+echo -en "----------------------------------------------------------------------\n"
+# arch-chroot /mnt /bin/bash -c "echo '${hostnm}' > /etc/hostname"  # manual version
+arch-chroot /mnt /bin/bash -c "hostnamectl set-hostname ${hostnm}"
+arch-chroot /mnt /bin/bash -c "echo '# Static table lookup for hostnames.' > /etc/hosts"
+{
+    echo "127.0.0.1 localhost"
+    echo "::1       localhost"
+    echo "127.0.1.1 ${hostnm}.localdomain   ${hostnm}"
+} >> /mnt/etc/hosts
+sleep 1
+#-------
+echo -en "| Конфигурируем юзеров (root и ${usernm})...\n"
+echo -en "----------------------------------------------------------------------\n"
+echo "root:${rootpsw}" | arch-chroot /mnt chpasswd
+arch-chroot /mnt /bin/bash -c "useradd -m -G wheel,audio,video,storage -s /bin/bash ${usernm}"
+arch-chroot /mnt /bin/bash -c "echo 'EDITOR=micro' >> /etc/environment"
+echo "${usernm}:${userpsw}" | arch-chroot /mnt chpasswd
+arch-chroot /mnt /bin/bash -c "sed -i '/^# %wheel ALL=(ALL:ALL) ALL/s/^..//' /etc/sudoers"
+#-------
+echo -en "| Настраиваем pacman и обновляем пакетную базу...\n"
+echo -en "----------------------------------------------------------------------\n"
+sed -i '/^#Color/s/^.//' /mnt/etc/pacman.conf
+sed -i '/^#VerbosePkgLists/s/^.//' /mnt/etc/pacman.conf
+sed -i '/^#ParallelDownloads = 5/s/^.//' /mnt/etc/pacman.conf
+sed -i "/\[multilib\]/,/Include/"'s/^#//' /mnt/etc/pacman.conf
+arch-chroot /mnt /bin/bash -c "pacman -Syy"
+arch-chroot /mnt /bin/bash -c "reflector --verbose --country 'Russia,Germany,' --latest 5 --sort rate --save /etc/pacman.d/mirrorlist"
+arch-chroot /mnt /bin/bash -c "sed -i s/'# --country France,Germany'/'--country Russia,Germany'/g /etc/xdg/reflector/reflector.conf"
+arch-chroot /mnt /bin/bash -c "sed -i s/'--sort age'/'--sort rate'/g /etc/xdg/reflector/reflector.conf"
+sleep 1
+#-------
+echo -en "| Устанавливаем нужные для файловой системы пакеты...\n"
+echo -en "----------------------------------------------------------------------\n"
+pacstrap -K /mnt networkmanager --noconfirm --needed
+install $(dirname $0)/pkgs/cmd.txt
+install $(dirname $0)/pkgs/fs.txt
+install $(dirname $0)/pkgs/xorg.txt
+install $(dirname $0)/pkgs/nvidia.txt
+arch-chroot /mnt /bin/bash -c "sed -i s/'MODULES=()'/'MODULES=(amdgpu nvidia nvidia_modeset nvidia_uvm nvidia_drm)'/g /etc/mkinitcpio.conf"
+install $(dirname $0)/pkgs/boot_tools.txt
+sleep 1
+#-------
+echo -en "| Устанавливаем и настраиваем загрузчик SYSTEMD-BOOT...\n"
+echo -en "----------------------------------------------------------------------\n"
+if [[ "${part_type}" = "1" ]]; then
+    source $(dirname $0)/hlprs/boot-helper
+else
+    source $(dirname $0)/hlprs/boot-helper-ext
+fi
+echo "| Загрузчик установлен и настроен..."
+sleep 1
+#-------
+echo -en "| Запускаем нужные сервисы...\n"
+echo -en "----------------------------------------------------------------------\n"
+arch-chroot /mnt /bin/bash -c "systemctl enable NetworkManager.service"
+arch-chroot /mnt /bin/bash -c "systemctl enable sshd.service"
+arch-chroot /mnt /bin/bash -c "systemctl enable fstrim.timer"
+arch-chroot /mnt /bin/bash -c "systemctl enable reflector.timer"
+arch-chroot /mnt /bin/bash -c "systemctl enable systemd-timesyncd.service"
+#-------
+unset BLINK
+unset BLACK
+unset RED
+unset LRED
+unset GREEN
+unset LGREEN
+unset BLUE
+unset LBLUE
+unset WHITE
+unset LWHITE
+unset NORMAL
+unset blocks
+unset archdisk
+unset part_type
+unset home_type
+unset partition1
+unset partition2
+unset partition3
+unset partition4
+unset anydisk
+unset anydir
+unset gen_choice
+unset again_choise
+unset pass_len
+unset hostnm
+unset rootpsw
+unset usernm
+unset userpsw
+unset time_zone
+unset proc_type
+unset proc_ucode
+unset ncpu
+unset TOTAL_MEM
+unset UUID
+#-------
+echo -en "| Arch Linux установлен и настроен...\n"
+echo -en "| Пожалуйста выполните << umount -a >> и << reboot >> для загрузки в новую систему!!!\n"
+echo -en "----------------------------------------------------------------------\n"
+#-------
+exit
