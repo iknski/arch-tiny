@@ -47,7 +47,7 @@ while true; do
             #-------
             echo -en "----------------------------------------------------------------------\n"
             echo -en "| Создание файловой системы EXT4 на диске ${archdisk}...\n"
-            mkfs.ext4 -qF -L ROOT /dev/${partition2} &>/dev/null
+            mkfs.ext4 -qF -L ROOT /dev/${partition3} &>/dev/null
             mount /dev/${partition3} /mnt
             mkdir -p /mnt/{efi,boot}
             mkfs.vfat -F32 -n ESP /dev/${partition1} &>/dev/null
