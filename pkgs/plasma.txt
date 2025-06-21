@@ -13,7 +13,6 @@ kde-inotify-survey
 kdegraphics-thumbnailers
 kimageformats
 kcalc
-kmix
 kompare
 isoimagewriter
 kget
@@ -25,3 +24,6 @@ kcolorchooser
 kolourpaint
 ktorrent
 okteta
+kcharselect
+kdf
+kdevelop
