@@ -17,6 +17,7 @@ kompare
 isoimagewriter
 kget
 gwenview
+ghostwriter
 filelight
 kdeconnect
 partitionmanager
