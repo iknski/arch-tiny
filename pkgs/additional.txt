@@ -9,6 +9,7 @@ parted
 nvme-cli
 reflector
 micro
+ghostwriter
 terminus-font
 ttf-iosevka-nerd
 ttf-firacode-nerd
