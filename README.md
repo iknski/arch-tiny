@@ -1,8 +1,6 @@
 ## <b style="color:DodgerBlue">Установка ArchLinux шаг за шагом (устаревшая и старая)</b>
 
 ---
-><span style="color:FireBrick">Для автоматической установки выполните <kbd>`git clone`</kbd> данного репозитория<br></span>
-><span style="color:FireBrick">Далее запустите <kbd>`arch-minimal`</kbd> и  следуйте подсказкам.<br></span>
 
 Все что написано ниже, лишь пример для вашего понимания
 
