@@ -289,8 +289,8 @@ sleep 1
 #-------
 echo -en "| Применяем настройки хоста...\n"
 echo -en "----------------------------------------------------------------------\n"
-# arch-chroot /mnt /bin/bash -c "echo '${hostnm}' > /etc/hostname"  # manual version
 arch-chroot /mnt /bin/bash -c "hostnamectl set-hostname ${hostnm}"
+arch-chroot /mnt /bin/bash -c "echo '${hostnm}' > /etc/hostname"
 arch-chroot /mnt /bin/bash -c "echo '# Static table lookup for hostnames.' > /etc/hosts"
 {
     echo "127.0.0.1 localhost"
