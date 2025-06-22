@@ -4,11 +4,16 @@ pacman-contrib
 sudo
 git
 wget
+less
 openssh
 parted
 nvme-cli
 reflector
 micro
+unrar
+unzip
+unace
+7zip
 terminus-font
 ttf-iosevka-nerd
 ttf-firacode-nerd
