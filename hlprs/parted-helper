@@ -5,7 +5,7 @@
 # https://www.gnu.org/software/parted/manual/html_node/set.html
 
 while true; do
-    echo -en "| Хотите ли вы создать отдельный раздел ${GREEN}/HOME?\n${NORMAL}"
+    echo -en "| Хотите ли вы создать отдельный раздел ${GREEN}/HOME\n${NORMAL}?"
     echo -en "| Оставьте поле пустым для выбора по умолчанию: ${GREEN}Без отдельного раздела HOME\n${NORMAL}"
     echo -en "----------------------------------------------------------------------\n"
     echo -en "| 1 - Без отдельного раздела /HOME\n| 2 - С отдельным разделом /HOME\n"
