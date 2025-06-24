@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 #
-# Automated Arch Linux Installer by iknski - mini version with
+# Automated Arch Linux Installer by iknski
 # --------------------------------------------------------------------
 # Author    : iknski
 # License   : GNU GPLv2 (https://www.gnu.org/licenses/old-licenses/gpl-2.0.html)
 # Version   : v 2.1
 # --------------------------------------------------------------------
-# 20.06.2025
+# 24.06.2025
 #
 
 pacman -Sy --noconfirm archlinux-keyring
@@ -36,11 +36,13 @@ echo -en "
 | Внимание!!!
 |
 | ***
-| Скрипт поставляется как есть и писался для себя
-| Можете видоизменить его под свое оборудование
+| Скрипт поставляется как есть так как писался для себя
+| Минимальное вмешательство при установке:
+| Только файловая система EXT4
+| Только загрузчик SYSTEMD-BOOT
 |
 | ***
-| Создан исключительно для UEFI API и NVME дисков
+| Сделано для ноутбуков ASUS, под UEFI API и NVME диски
 | Будут установлены новейшие драйверы для видеокарт NVIDIA
 | и произведены настройки в параметрах ядра и файле mkinitcpio.conf
 |
@@ -50,7 +52,7 @@ echo -en "
 | Установите нужные вам пакеты и графическое окружение
 ----------------------------------------------------------------------
 "
-read -r -sn1 -p "| Нажмите любую клавишу чтобы продолжить..."
+read -r -sn1 -p "| Нажмите любую клавишу чтобы продолжить...\n| Или откажитесь от установки >> CTRL+C"
 echo -en "----------------------------------------------------------------------\n"
 #-------
 timedatectl set-ntp true
@@ -76,18 +78,28 @@ for item in "${blocks[@]}"; do
         echo "| Ваш выбор: ${archdisk}"
         break
     else
-        echo "| ${archdisk} - нет такого диска, попробуйте ввести снова ..."
+        echo "| ${archdisk} - видимо вы ошиблись при вводе, попробуйте снова ..."
         continue
     fi
 done
 #-------
-echo -en "----------------------------------------------------------------------\n"
-echo -en "| Выберите схему разметки дискового пространства:\n"
-echo -en "| Классическая или схема с XBOOTLDR (Linux Extended Boot Loader)\n"
-echo -en "| Оставьте поле пустым для выбора по умолчанию: ${GREEN}Классическая\n${NORMAL}"
-echo -en "----------------------------------------------------------------------\n"
-echo -en "| 1 - Классическая\n| 2 - XBOOTLDR\n"
-read -r -p "| Ваш выбор (1/2): >>> " part_type
+while true; do
+    echo -en "----------------------------------------------------------------------\n"
+    echo -en "| Выберите схему разметки дискового пространства:\n"
+    echo -en "| Классическая или схема с XBOOTLDR (Linux Extended Boot Loader)\n"
+    echo -en "| Если не уверены, выберите ${GREEN}Классическую\n${NORMAL}"
+    echo -en "----------------------------------------------------------------------\n"
+    echo -en "| 1 - Классическая\n| 2 - XBOOTLDR\n"
+    read -r -p "| Ваш выбор (1/2): >>> " part_type
+    case ${part_type} in
+        1) echo "| Выбрана классическая схема разметки"
+        break;;
+        2) echo "| Выбрана схема с XBOOTLDR (Linux Extended Boot Loader)"
+        break;;
+        *) echo "| Неверный ввод, попробуйте снова..."
+        continue;;
+    esac
+done
 #-------
 while true; do
     echo -en "----------------------------------------------------------------------\n"
@@ -265,6 +277,7 @@ sed -i "s/#MAKEFLAGS=\"-j2\"/MAKEFLAGS=\"-j${ncpu}\"/g" /mnt/etc/makepkg.conf
 sed -i "s/COMPRESSXZ=(xz -c -z -)/COMPRESSXZ=(xz -c -T ${ncpu} -z -)/g" /mnt/etc/makepkg.conf
 fi
 #-------
+echo -en "----------------------------------------------------------------------\n"
 echo -en "| Настриваем локали...\n"
 echo -en "----------------------------------------------------------------------\n"
 arch-chroot /mnt /bin/bash -c "sed -i '/^#en_US.UTF-8/s/^.//' /etc/locale.gen"
@@ -281,6 +294,7 @@ arch-chroot /mnt /bin/bash -c "echo 'LANG=ru_RU.UTF-8' > /etc/locale.conf"
 } >> /mnt/etc/vconsole.conf
 sleep 1
 #-------
+echo -en "----------------------------------------------------------------------\n"
 echo -en "| Синхронизируем время...\n"
 echo -en "----------------------------------------------------------------------\n"
 arch-chroot /mnt /bin/bash -c "ln -sf /usr/share/zoneinfo/${time_zone} /etc/localtime"
@@ -313,6 +327,11 @@ sed -i '/^#Color/s/^.//' /mnt/etc/pacman.conf
 sed -i '/^#VerbosePkgLists/s/^.//' /mnt/etc/pacman.conf
 sed -i '/^#ParallelDownloads = 5/s/^.//' /mnt/etc/pacman.conf
 sed -i "/\[multilib\]/,/Include/"'s/^#//' /mnt/etc/pacman.conf
+#-------
+# добавление репозиториев g14 (нужны для установки пакетов Asus-приложений не через AUR)
+sed -i s/'#\[custom\]'/'\[g14\]'/g /mnt/etc/pacman.conf
+sed -i s/'#Server = file:\/\/\/home\/custompkgs'/'Server = https:\/\/naru.jhyub.dev\/\$repo'/g /mnt/etc/pacman.conf
+#-------
 arch-chroot /mnt /bin/bash -c "pacman -Syy"
 arch-chroot /mnt /bin/bash -c "reflector --verbose --country 'Russia,Germany,' --latest 5 --sort rate --save /etc/pacman.d/mirrorlist"
 arch-chroot /mnt /bin/bash -c "sed -i s/'# --country France,Germany'/'--country Russia,Germany'/g /etc/xdg/reflector/reflector.conf"
@@ -382,6 +401,10 @@ unset proc_ucode
 unset ncpu
 unset TOTAL_MEM
 unset UUID
+#-------
+cp -a -T $(dirname $0)/pkgs/plasma.txt /mnt/~
+cp -a -T $(dirname $0)/pkgs/asus.txt /mnt/~
+cp -a -T $(dirname $0)/pkgs/setup_asus.txt /mnt/~
 #-------
 echo -en "| Arch Linux установлен и настроен...\n"
 echo -en "| Пожалуйста выполните << umount -a >> и << reboot >> для загрузки в новую систему!!!\n"
