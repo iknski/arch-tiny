@@ -329,8 +329,8 @@ sed -i '/^#ParallelDownloads = 5/s/^.//' /mnt/etc/pacman.conf
 sed -i "/\[multilib\]/,/Include/"'s/^#//' /mnt/etc/pacman.conf
 #-------
 # добавление репозиториев g14 (нужны для установки пакетов Asus-приложений не через AUR)
-sed -i s/'#\[custom\]'/'\[g14\]'/g /mnt/etc/pacman.conf
-sed -i s/'#Server = file:\/\/\/home\/custompkgs'/'Server = https:\/\/naru.jhyub.dev\/\$repo'/g /mnt/etc/pacman.conf
+# sed -i s/'#\[custom\]'/'\[g14\]'/g /mnt/etc/pacman.conf
+# sed -i s/'#Server = file:\/\/\/home\/custompkgs'/'Server = https:\/\/naru.jhyub.dev\/\$repo'/g /mnt/etc/pacman.conf
 #-------
 arch-chroot /mnt /bin/bash -c "pacman -Syy"
 arch-chroot /mnt /bin/bash -c "reflector --verbose --country 'Russia,Germany,' --latest 5 --sort rate --save /etc/pacman.d/mirrorlist"
@@ -401,10 +401,6 @@ unset proc_ucode
 unset ncpu
 unset TOTAL_MEM
 unset UUID
-#-------
-cp -a -T $(dirname $0)/pkgs/plasma.txt /mnt/~
-cp -a -T $(dirname $0)/pkgs/asus.txt /mnt/~
-cp -a -T $(dirname $0)/pkgs/setup_asus.txt /mnt/~
 #-------
 echo -en "| Arch Linux установлен и настроен...\n"
 echo -en "| Пожалуйста выполните << umount -a >> и << reboot >> для загрузки в новую систему!!!\n"
