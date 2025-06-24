@@ -1,0 +1,5 @@
+asusctl
+supergfxctl
+witcheroo-control
+plasma6-applets-supergfxctl
+rog-control-center

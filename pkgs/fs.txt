@@ -2,5 +2,5 @@ e2fsprogs
 btrfs-progs
 exfatprogs
 udftools
-ntfs-3g
 dosfstools
+ntfs-3g
