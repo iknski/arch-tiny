@@ -5,7 +5,7 @@
 # https://www.gnu.org/software/parted/manual/html_node/set.html
 
 while true; do
-    echo -en "| Хотите ли вы создать отдельный раздел ${GREEN}/HOME\n${NORMAL}?"
+    echo -en "| Хотите ли вы создать отдельный раздел ${GREEN}/HOME${NORMAL}?\n"
     echo -en "| Оставьте поле пустым для выбора по умолчанию: ${GREEN}Без отдельного раздела HOME\n${NORMAL}"
     echo -en "----------------------------------------------------------------------\n"
     echo -en "| 1 - Без отдельного раздела /HOME\n| 2 - С отдельным разделом /HOME\n"
@@ -77,11 +77,11 @@ while true; do
             sleep 1
             #-------
             echo -en "| Создание системного раздела (Linux Root partition (4F68BCE3-E8CD-4DB1-96E7-FBCAF984B709)) на диске ${archdisk}...\n"
-            parted -s --align optimal /dev/${archdisk} mkpart root ext4 1281MiB 34049MiB
+            parted -s --align optimal /dev/${archdisk} mkpart root ext4 1281MiB 132353MiB
             parted -s /dev/${archdisk} type 3 4F68BCE3-E8CD-4DB1-96E7-FBCAF984B709
             #-------
             echo -en "| Создание домашнего раздела (Linux Home partition (933AC7E1-2EB4-4F13-B844-0E14E2AEF915)) на диске ${archdisk}...\n"
-            parted -s --align optimal /dev/${archdisk} mkpart home ext4 34049MiB 100%
+            parted -s --align optimal /dev/${archdisk} mkpart home ext4 132353MiB 100%
             parted -s /dev/${archdisk} set 4 linux-home on
             #-------
             if [[ "${archdisk}" =~ "nvme" ]]; then
