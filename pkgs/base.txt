@@ -2,6 +2,5 @@ base
 base-devel
 linux
 linux-firmware
-linux-firmware-cirrus
 linux-headers
 sof-firmware

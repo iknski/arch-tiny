@@ -4,3 +4,4 @@ exfatprogs
 udftools
 dosfstools
 ntfs-3g
+sshfs
