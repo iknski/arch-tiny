@@ -24,5 +24,5 @@ arch-chroot /mnt /bin/bash -c "bootctl install"
     echo "initrd    /initramfs-linux-fallback.img"
 } >> /mnt/boot/loader/entries/arch-fb.conf
 #-------
-echo "options    root=\"UUID=${UUID}\" rw nvme_load=YES nvme_core.default_ps_max_latency_us=0 raid=noautodetect rootfstype=ext4 nvidia_drm.modeset=1" >> /mnt/boot/loader/entries/arch.conf
-echo "options    root=\"UUID=${UUID}\" rw nvme_load=YES nvme_core.default_ps_max_latency_us=0 raid=noautodetect rootfstype=ext4 nvidia_drm.modeset=1" >> /mnt/boot/loader/entries/arch-fb.conf
+echo "options    root=\"UUID=${UUID}\" rw nvme_load=YES nvme_core.default_ps_max_latency_us=0 raid=noautodetect rootfstype=ext4 zswap.enabled=1 nvidia_drm.modeset=1" >> /mnt/boot/loader/entries/arch.conf
+echo "options    root=\"UUID=${UUID}\" rw nvme_load=YES nvme_core.default_ps_max_latency_us=0 raid=noautodetect rootfstype=ext4 zswap.enabled=1 nvidia_drm.modeset=1" >> /mnt/boot/loader/entries/arch-fb.conf
