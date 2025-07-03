@@ -261,14 +261,14 @@ install $(dirname $0)/pkgs/base.txt
 pacstrap -K /mnt ${proc_ucode} --noconfirm
 install $(dirname $0)/pkgs/driver.txt
 install $(dirname $0)/pkgs/additional.txt
-#———-
+#-------
 echo -en "----------------------------------------------------------------------\n"
 echo -en "| ${LBLUE}Arch Linux${NORMAL} установлен...\n"
 echo -en "| Генерируем таблицу файловой системы...\n"
 echo -en "----------------------------------------------------------------------\n"
 genfstab -U /mnt >> /mnt/etc/fstab
 cat /mnt/etc/fstab
-sleep 3
+sleep 5
 #-------
 # твик компилятора
 ncpu=$(grep -c ^processor /proc/cpuinfo)
