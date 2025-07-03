@@ -261,6 +261,10 @@ install $(dirname $0)/pkgs/base.txt
 pacstrap -K /mnt ${proc_ucode} --noconfirm
 install $(dirname $0)/pkgs/driver.txt
 install $(dirname $0)/pkgs/additional.txt
+#-------
+arch-chroot /mnt /bin/bash -c "mkswap -U clear --size $($(grep -Po 'MemTotal:\s*\K\d+' /proc/meminfo)*1.5)KiB --file /swapfile"
+arch-chroot /mnt /bin/bash -c "swapon /swapfile"
+#-------
 echo -en "----------------------------------------------------------------------\n"
 echo -en "| ${LBLUE}Arch Linux${NORMAL} установлен...\n"
 echo -en "| Генерируем таблицу файловой системы...\n"
