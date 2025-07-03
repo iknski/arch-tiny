@@ -17,7 +17,8 @@ systemctl enable --now power-profiles-daemon.service
 #
 pacman -S supergfxctl switcheroo-control
 #
-systemctl enable --now supergfxd
+sudo systemctl enable supergfxd.service --now
+sudo usermod -a -G users $USER
 systemctl enable --now switcheroo-control
 #
 sudo systemctl enable nvidia-powerd.service
