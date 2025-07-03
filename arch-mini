@@ -289,8 +289,8 @@ arch-chroot /mnt /bin/bash -c "echo 'LANG=ru_RU.UTF-8' > /etc/locale.conf"
     echo "KEYMAP=ru"
     echo "FONT=ter-v32n"
     echo "XKBLAYOUT=ru"
-    echo "XKBMODEL=pc105+inet"
-    echo "XKBOPTIONS=terminate:ctrl_alt_bksp,grp:ctrl_shift_toggle"
+    echo "XKBMODEL=asus_laptop"
+    echo "XKBOPTIONS=terminate:ctrl_alt_bksp,grp:caps_toggle"
 } >> /mnt/etc/vconsole.conf
 sleep 1
 #-------
