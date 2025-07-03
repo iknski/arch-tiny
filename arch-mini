@@ -404,10 +404,6 @@ unset ncpu
 unset TOTAL_MEM
 unset UUID
 #-------
-cp -a -T $(dirname $0)/pkgs/plasma.txt /mnt/~
-cp -a -T $(dirname $0)/pkgs/asus.txt /mnt/~
-cp -a -T $(dirname $0)/pkgs/setup_asus.txt /mnt/~
-#-------
 echo -en "| Arch Linux установлен и настроен...\n"
 echo -en "| Пожалуйста выполните << umount -a >> и << reboot >> для загрузки в новую систему!!!\n"
 echo -en "----------------------------------------------------------------------\n"
