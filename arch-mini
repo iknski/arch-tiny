@@ -6,13 +6,13 @@
 # License   : GNU GPLv2 (https://www.gnu.org/licenses/old-licenses/gpl-2.0.html)
 # Version   : v 2.1
 # --------------------------------------------------------------------
-# 24.06.2025
+# 04.07.2025
 #
 
 pacman -Sy --noconfirm archlinux-keyring
 pacman -S --noconfirm --needed pacman-contrib terminus-font
 loadkeys ru
-setfont ter-v32n
+setfont ter-v32n -m 8859-5
 BLINK="\033[5m"
 BLACK="\033[0;30m"
 RED="\033[0;31m"
@@ -292,10 +292,8 @@ arch-chroot /mnt /bin/bash -c "echo 'LANG=ru_RU.UTF-8' > /etc/locale.conf"
 {
     echo "KEYMAP=ru"
     echo "FONT=ter-v32n"
-    echo "XKBLAYOUT=ru"
-    echo "XKBMODEL=asus_laptop"
-    echo "XKBOPTIONS=terminate:ctrl_alt_bksp,grp:win_space_toggle"
 } >> /mnt/etc/vconsole.conf
+arch-chroot /mnt /bin/bash -c "localectl --no-convert set-x11-keymap us,ru asus_laptop '' grp:win_space_toggle"
 sleep 1
 #-------
 echo -en "----------------------------------------------------------------------\n"
@@ -367,8 +365,10 @@ echo -en "| Запускаем нужные сервисы...\n"
 echo -en "----------------------------------------------------------------------\n"
 arch-chroot /mnt /bin/bash -c "systemctl enable NetworkManager.service"
 arch-chroot /mnt /bin/bash -c "systemctl enable sshd.service"
+arch-chroot /mnt /bin/bash -c "systemctl enable fstrim.service"
 arch-chroot /mnt /bin/bash -c "systemctl enable fstrim.timer"
 arch-chroot /mnt /bin/bash -c "systemctl enable reflector.service"
+arch-chroot /mnt /bin/bash -c "systemctl enable reflector.timer"
 arch-chroot /mnt /bin/bash -c "systemctl enable systemd-timesyncd.service"
 arch-chroot /mnt /bin/bash -c "systemctl enable nvidia-powerd.service"
 #-------
