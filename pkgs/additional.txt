@@ -17,3 +17,5 @@ unace
 terminus-font
 ttf-iosevka-nerd
 ttf-firacode-nerd
+ttf-dejavu
+ttf-liberation
