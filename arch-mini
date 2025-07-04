@@ -285,7 +285,6 @@ echo -en "----------------------------------------------------------------------
 echo -en "| Настриваем локали...\n"
 echo -en "----------------------------------------------------------------------\n"
 arch-chroot /mnt /bin/bash -c "sed -i '/^#en_US.UTF-8/s/^.//' /etc/locale.gen"
-sed -i '/^#ru_RU.UTF-8/s/^.//' /etc/locale.gen
 arch-chroot /mnt /bin/bash -c "sed -i '/^#ru_RU.UTF-8/s/^.//' /etc/locale.gen"
 arch-chroot /mnt /bin/bash -c "locale-gen"
 arch-chroot /mnt /bin/bash -c "echo 'LANG=ru_RU.UTF-8' > /etc/locale.conf"
@@ -294,7 +293,7 @@ arch-chroot /mnt /bin/bash -c "echo 'LANG=ru_RU.UTF-8' > /etc/locale.conf"
     echo "FONT=ter-v32n"
     echo "XKBLAYOUT=ru"
     echo "XKBMODEL=asus_laptop"
-    echo "XKBOPTIONS=terminate:ctrl_alt_bksp,grp:caps_toggle"
+    echo "XKBOPTIONS=terminate:ctrl_alt_bksp,grp:win_space_toggle"
 } >> /mnt/etc/vconsole.conf
 sleep 1
 #-------
@@ -369,7 +368,6 @@ arch-chroot /mnt /bin/bash -c "systemctl enable NetworkManager.service"
 arch-chroot /mnt /bin/bash -c "systemctl enable sshd.service"
 arch-chroot /mnt /bin/bash -c "systemctl enable fstrim.timer"
 arch-chroot /mnt /bin/bash -c "systemctl enable reflector.service"
-arch-chroot /mnt /bin/bash -c "systemctl enable reflector.timer"
 arch-chroot /mnt /bin/bash -c "systemctl enable systemd-timesyncd.service"
 arch-chroot /mnt /bin/bash -c "systemctl enable nvidia-powerd.service"
 #-------
