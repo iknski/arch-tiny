@@ -9,8 +9,9 @@
 # 04.07.2025
 #
 
-pacman -Sy --noconfirm archlinux-keyring
-pacman -S --noconfirm --needed pacman-contrib terminus-font
+pacman -Syy --noconfirm archlinux-keyring
+pacman -S --noconfirm --needed pacman-contrib terminus-font reflector
+reflector --verbose --latest 10 --sort rate --save /etc/pacman.d/mirrorlist
 loadkeys ru
 setfont ter-v32n -m 8859-5
 BLINK="\033[5m"
