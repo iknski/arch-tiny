@@ -35,3 +35,4 @@ print-manager
 system-config-printer
 cups
 sonnet
+plasma-browser-integration
