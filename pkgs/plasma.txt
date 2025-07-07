@@ -34,3 +34,4 @@ bash-language-server
 print-manager
 system-config-printer
 cups
+sonnet
