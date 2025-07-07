@@ -9,6 +9,10 @@ openssh
 parted
 nvme-cli
 reflector
+brightnessctl
+acpi
+bluez
+bluez-utils
 micro
 unrar
 unzip
