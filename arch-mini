@@ -294,7 +294,7 @@ arch-chroot /mnt /bin/bash -c "echo 'LANG=ru_RU.UTF-8' > /etc/locale.conf"
     echo "KEYMAP=ru"
     echo "FONT=ter-v32n"
 } >> /mnt/etc/vconsole.conf
-arch-chroot /mnt /bin/bash -c "localectl --no-convert set-x11-keymap us,ru asus_laptop '' grp:win_space_toggle"
+# arch-chroot /mnt /bin/bash -c "localectl --no-convert set-x11-keymap us,ru asus_laptop '' grp:win_space_toggle"
 sleep 1
 #-------
 echo -en "----------------------------------------------------------------------\n"
