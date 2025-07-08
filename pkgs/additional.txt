@@ -9,6 +9,7 @@ openssh
 parted
 nvme-cli
 reflector
+rsync
 brightnessctl
 acpi
 bluez
@@ -19,7 +20,3 @@ unzip
 unace
 7zip
 terminus-font
-ttf-iosevka-nerd
-ttf-firacode-nerd
-ttf-dejavu
-ttf-liberation
