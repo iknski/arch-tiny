@@ -10,7 +10,7 @@
 #
 
 pacman -Syy --noconfirm archlinux-keyring
-pacman -S --noconfirm --needed pacman-contrib terminus-font reflector
+pacman -S --noconfirm --needed pacman-contrib terminus-font reflector rsync
 reflector --verbose --latest 10 --sort rate --save /etc/pacman.d/mirrorlist
 loadkeys ru
 setfont ter-v32n -m 8859-5
