@@ -4,9 +4,9 @@
 # --------------------------------------------------------------------
 # Author    : iknski
 # License   : GNU GPLv2 (https://www.gnu.org/licenses/old-licenses/gpl-2.0.html)
-# Version   : v 2.1
+# Version   : v 2.2
 # --------------------------------------------------------------------
-# 04.07.2025
+# 15.07.2025
 #
 
 pacman -Syy --noconfirm archlinux-keyring
