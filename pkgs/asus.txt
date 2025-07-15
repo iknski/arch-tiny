@@ -1,5 +1,5 @@
 asusctl
 supergfxctl
-witcheroo-control
+switcheroo-control
 plasma6-applets-supergfxctl
 rog-control-center

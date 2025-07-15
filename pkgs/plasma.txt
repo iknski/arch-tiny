@@ -31,8 +31,14 @@ okteta
 kcharselect
 kdf
 bash-language-server
+vscode-json-languageserver
+vscode-html-languageserver
+vscode-css-languageserver
 print-manager
 system-config-printer
 cups
 sonnet
 plasma-browser-integration
+vlc
+vlc-plugins-all
+amarok
