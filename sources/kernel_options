@@ -1,1 +1,7 @@
-
+rw
+nvme_load=YES
+nvme_core.default_ps_max_latency_us=0
+raid=noautodetect
+rootfstype=ext4
+zswap.enabled=1
+nvidia_drm.modeset=1
