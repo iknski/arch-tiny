@@ -12,8 +12,6 @@ reflector
 rsync
 brightnessctl
 acpi
-bluez
-bluez-utils
 micro
 unrar
 unzip

@@ -1,5 +1,4 @@
 e2fsprogs
-btrfs-progs
 exfatprogs
 udftools
 dosfstools

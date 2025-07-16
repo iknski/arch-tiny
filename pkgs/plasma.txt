@@ -42,3 +42,5 @@ plasma-browser-integration
 vlc
 vlc-plugins-all
 amarok
+bluez
+bluez-utils
