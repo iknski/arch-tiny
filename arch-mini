@@ -355,7 +355,7 @@ install $(dirname $0)/pkgs/cmd.txt
 install $(dirname $0)/pkgs/fs.txt
 install $(dirname $0)/pkgs/xorg.txt
 install $(dirname $0)/pkgs/nvidia.txt
-arch-chroot /mnt /bin/bash -c "sed -i s/'MODULES=()'/'MODULES=(amdgpu nvidia nvidia_modeset nvidia_uvm nvidia_drm)'/g /etc/mkinitcpio.conf"
+sed -i "s/^MODULES=()/MODULES=($(tr '\n' ' ' < $(dirname $0)/sources/modules | sed 's/ $//'))/" /mnt/etc/mkinitcpio.conf
 install $(dirname $0)/pkgs/boot_tools.txt
 sleep 1
 #-------
