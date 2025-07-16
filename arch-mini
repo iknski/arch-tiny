@@ -353,7 +353,7 @@ echo -en "----------------------------------------------------------------------
 pacstrap -K /mnt networkmanager --noconfirm --needed
 install $(dirname $0)/pkgs/cmd.txt
 install $(dirname $0)/pkgs/fs.txt
-install $(dirname $0)/pkgs/xorg.txt
+# install $(dirname $0)/pkgs/xorg.txt
 install $(dirname $0)/pkgs/nvidia.txt
 sed -i "s/^MODULES=()/MODULES=($(tr '\n' ' ' < $(dirname $0)/sources/modules | sed 's/ $//'))/" /mnt/etc/mkinitcpio.conf
 install $(dirname $0)/pkgs/boot_tools.txt
