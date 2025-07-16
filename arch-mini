@@ -6,12 +6,12 @@
 # License   : GNU GPLv2 (https://www.gnu.org/licenses/old-licenses/gpl-2.0.html)
 # Version   : v 2.2
 # --------------------------------------------------------------------
-# 15.07.2025
+# 16.07.2025
 #
 
 pacman -Syy --noconfirm archlinux-keyring
 pacman -S --noconfirm --needed pacman-contrib terminus-font reflector rsync
-reflector --verbose --latest 10 --sort rate --save /etc/pacman.d/mirrorlist
+reflector --verbose --latest 10 --protocol https,ftp,rsync --sort rate --save /etc/pacman.d/mirrorlist
 loadkeys ru
 setfont ter-v32n -m 8859-5
 BLINK="\033[5m"
@@ -51,6 +51,13 @@ echo -en "
 | Скрипт установит ${LBLUE}Arch Linux${NORMAL} в минимальной версии
 | После установки подключитесь к интернету с помощью Network Manager (nmcli)
 | Установите нужные вам пакеты и графическое окружение
+| В составе есть Plasma (KDE), но она не устанавливается автоматически
+| Можете доустановить после основной установки.
+| ${LRED}Пример:${NORMAL}
+| ---
+| ${LGREEN}arch-chroot /mnt
+| pacman -S \$(cat ~/arch-tiny/pkgs/plasma.txt)${NORMAL}
+| ---
 ----------------------------------------------------------------------
 "
 read -r -sn1 -p "| Нажмите любую клавишу чтобы продолжить... Или откажитесь от установки >> CTRL+C"
